@@ -1,7 +1,7 @@
 {
-  "name": "relay-todo",
+  "name": "graphql-server-example",
   "version": "1.0.0",
-  "description": "",
+  "description": "Example implementaion of GraphQL Server",
   "scripts": {
     "server": "$(npm bin)/babel-node server/server.js"
   },
