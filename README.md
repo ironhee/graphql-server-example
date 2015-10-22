@@ -1,4 +1,4 @@
-# What it is?
+# What is it?
 Example Implementation of [GraphQL](https://facebook.github.io/graphql/) Server.
 
 ## Setup
