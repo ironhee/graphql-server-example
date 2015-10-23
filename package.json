@@ -20,6 +20,8 @@
     "graphql-relay": "^0.3.3",
     "jwt-simple": "^0.3.1",
     "lodash": "^3.10.1",
-    "node-uuid": "^1.4.3"
+    "lowdb": "^0.10.2",
+    "node-uuid": "^1.4.3",
+    "underscore-db": "^0.9.1"
   }
 }
