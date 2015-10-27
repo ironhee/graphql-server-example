@@ -1,17 +1,8 @@
-import Thinky from 'thinky';
+import { r } from './thinky';
+import models from './models';
 import {
   getOffsetWithDefault,
 } from 'graphql-relay';
-const thinky = new Thinky();
-const { type: TYPE, r } = thinky;
-
-
-const RESOURCES = {
-  Draft: thinky.createModel('Draft', {
-    id: TYPE.string().min(2),
-    createdAt: TYPE.date().default(r.now()),
-  }),
-};
 
 
 export function getOffsetsFromConnectionArgs(connectionArgs) {
@@ -23,29 +14,34 @@ export function getOffsetsFromConnectionArgs(connectionArgs) {
   return { startOffset, endOffset };
 }
 
-export function createResource(type, data) {
-  const Resource = RESOURCES[type];
+export function createResource(modelType, data) {
+  const Resource = models[modelType];
   const resource = new Resource(data);
   return resource.saveAll();
 }
 
-export function getResource(type, id) {
-  const Resource = RESOURCES[type];
+export function getResource(modelType, id) {
+  const Resource = models[modelType];
   return Resource.get(id);
 }
 
-export function getResources(type, startOffset, endOffset) {
-  const Resource = RESOURCES[type];
+export function getResources(modelType, startOffset, endOffset) {
+  const Resource = models[modelType];
   return Resource
   .orderBy(r.desc('date'))
   .slice(Math.max(startOffset, 0), endOffset)
   .run();
 }
 
-export function removeResource(type, id) {
+export function removeResource(modelType, id) {
 }
 
-export function updateResource(type, id, data) {
+export function updateResource(modelType, id, data) {
+}
+
+export function addRelation(parent, relationKey, child) {
+  const relation = parent[relationKey];
+  parent[relationKey] = [...relation, child];
 }
 
 createResource('Draft', { content: 'bar' });

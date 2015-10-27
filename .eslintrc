@@ -1,5 +1,9 @@
 {
     extends: ["airbnb"],
+    "env": {
+        "node": true,
+        "mocha": true
+    },
     rules: {
         id-length: 0,
         no-use-before-define: 0
