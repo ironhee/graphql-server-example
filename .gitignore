@@ -65,3 +65,5 @@ Session.vim
 .netrwhist
 *~
 
+####=== Rethink ===####
+rethinkdb_data

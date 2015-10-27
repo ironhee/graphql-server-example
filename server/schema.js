@@ -8,19 +8,20 @@ import {
   nodeDefinitions,
   connectionDefinitions,
   connectionArgs,
-  connectionFromArray,
   globalIdField,
   fromGlobalId,
+  connectionFromArraySlice,
   mutationWithClientMutationId,
 } from 'graphql-relay';
 
 import {
   getResource,
-  getAllResources,
+  getResources,
   createResource,
   removeResource,
   updateResource,
-} from './db';
+  getOffsetsFromConnectionArgs,
+} from './rethinkdb';
 
 const {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
@@ -58,10 +59,20 @@ const queryType = new GraphQLObjectType({
     drafts: {
       type: draftConnection,
       args: connectionArgs,
-      resolve: (root, args) => connectionFromArray(
-        getAllResources('Draft'),
-        args
-      ),
+      resolve: (root, args) => {
+        const { startOffset, endOffset } = getOffsetsFromConnectionArgs(args);
+        // to calculate hasNext, fetch one more resource.
+        return getResources('Draft', startOffset, endOffset + 1).then(resources => {
+          return connectionFromArraySlice(
+            resources,
+            args,
+            {
+              sliceStart: startOffset,
+              arrayLength: startOffset + resources.length,
+            }
+          );
+        });
+      },
     },
   },
 });
@@ -143,4 +154,3 @@ export default new GraphQLSchema({
   query: queryType,
   mutation: mutationType,
 });
-
