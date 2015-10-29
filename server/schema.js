@@ -11,6 +11,7 @@ import {
   globalIdField,
   fromGlobalId,
   connectionFromArraySlice,
+  getOffsetWithDefault,
   mutationWithClientMutationId,
 } from 'graphql-relay';
 
@@ -20,8 +21,17 @@ import {
   createResource,
   removeResource,
   updateResource,
-  getOffsetsFromConnectionArgs,
 } from './rethinkdb';
+
+
+function getOffsetsFromConnectionArgs(args) {
+  const { after, first = 10 } = args;
+  const afterOffset = getOffsetWithDefault(after, -1);
+
+  const startOffset = Math.max(afterOffset, -1) + 1;
+  const endOffset = startOffset + first;
+  return { startOffset, endOffset };
+}
 
 const {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
@@ -154,3 +164,7 @@ export default new GraphQLSchema({
   query: queryType,
   mutation: mutationType,
 });
+
+
+createResource('Draft', { content: 'bar' });
+createResource('Draft', { content: 'foo' });

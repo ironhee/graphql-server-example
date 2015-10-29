@@ -1,48 +1,45 @@
+import _ from 'lodash';
 import { r } from './thinky';
 import models from './models';
-import {
-  getOffsetWithDefault,
-} from 'graphql-relay';
 
 
-export function getOffsetsFromConnectionArgs(connectionArgs) {
-  const { after, first = 10 } = connectionArgs;
-  const afterOffset = getOffsetWithDefault(after, -1);
-
-  const startOffset = Math.max(afterOffset, -1) + 1;
-  const endOffset = startOffset + first;
-  return { startOffset, endOffset };
-}
-
-export function createResource(modelType, data) {
-  const Resource = models[modelType];
+export async function createResource(resourceType, data) {
+  const Resource = models[resourceType];
   const resource = new Resource(data);
-  return resource.saveAll();
+  await resource.saveAll();
+  return resource;
 }
 
-export function getResource(modelType, id) {
-  const Resource = models[modelType];
-  return Resource.get(id);
+export function getResource(resourceType, resourceId) {
+  const Resource = models[resourceType];
+  return Resource.get(resourceId);
 }
 
-export function getResources(modelType, startOffset, endOffset) {
-  const Resource = models[modelType];
-  return Resource
-  .orderBy(r.desc('date'))
-  .slice(Math.max(startOffset, 0), endOffset)
-  .run();
+export async function getResources(resourceType, startOffset, endOffset) {
+  const Resource = models[resourceType];
+  const resource = await Resource
+    .orderBy(r.desc('date'))
+    .slice(Math.max(startOffset, 0), endOffset)
+    .run();
+  return resource;
 }
 
-export function removeResource(modelType, id) {
+export async function removeResource(resourceType, resourceId) {
+  const resource = await getResource(resourceType, resourceId);
+  await resource.purge();
 }
 
-export function updateResource(modelType, id, data) {
+export async function updateResource(resourceType, resourceId, data) {
+  const resource = await getResource(resourceType, resourceId);
+  _.assign(resource, data);
+  await resource.saveAll();
 }
 
-export function addRelation(parent, relationKey, child) {
-  const relation = parent[relationKey];
-  parent[relationKey] = [...relation, child];
+export async function addRelation(parentResourceType, parentResourceId,
+                                  childResourceType, childResourceId, relationKey) {
+  const parentResource = await getResource(parentResourceType, parentResourceId);
+  const childResource = await getResource(childResourceType, childResourceId);
+  const relation = parentResource[relationKey];
+  parentResource[relationKey] = [...relation, childResource];
+  await parentResource.saveAll();
 }
-
-createResource('Draft', { content: 'bar' });
-createResource('Draft', { content: 'foo' });

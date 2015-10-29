@@ -13,10 +13,12 @@ const Revision = thinky.createModel('Revision', {
   createdAt: type.date().default(r.now()),
 });
 
+
+Draft.hasMany(Revision, 'revisions', 'id', 'draftId');
+Revision.belongsTo(Draft, 'draft', 'draftId', 'id');
+
+
 export default {
   Draft,
   Revision,
 };
-
-Draft.hasMany(Revision, 'revisions', 'id', 'draftId');
-Revision.belongsTo(Draft, 'draft', 'draftId', 'id');

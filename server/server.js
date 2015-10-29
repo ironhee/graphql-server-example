@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.load();
+
 import express from 'express';
 import schema from './schema';
 import jwt from './jwt';
