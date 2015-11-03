@@ -5,6 +5,7 @@ import clean from './tasks/clean';
 import bundle from './tasks/bundle';
 import copy from './tasks/copy';
 import updateSchema from './tasks/updateSchema';
+import graphqlServer from './tasks/graphqlServer';
 
 const tasks = {
   build,
@@ -13,6 +14,7 @@ const tasks = {
   bundle,
   copy,
   updateSchema,
+  graphqlServer,
 };
 
 if (process.argv.length > 2) {

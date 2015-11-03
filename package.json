@@ -2,12 +2,12 @@
   "name": "graphql-server-example",
   "scripts": {
     "test": "$(npm bin)/mocha $npm_package_options_mocha",
-    "test-watch": "$(npm bin)/mocha $npm_package_options_mocha --watch",
-    "server": "$(npm bin)/babel-node server/server.js",
-    "server-watch": "$(npm bin)/nodemon -e js --exec npm run server",
-    "update-schema": "$(npm bin)/babel-node tools/run.js updateSchema",
+    "test-watch": "npm run test -- --watch",
+    "server": "$(npm bin)/babel-node tools/run graphqlServer",
     "build": "$(npm bin)/babel-node tools/run.js build",
-    "serve": "$(npm bin)/babel-node tools/run.js serve"
+    "build-watch": "$(npm bin)/babel-node tools/run.js serve",
+    "update-schema": "$(npm bin)/babel-node tools/run.js updateSchema",
+    "start": "npm run server && npm run build-watch"
   },
   "options": {
     "mocha": "--stage 0 --compilers js:babel/register server/**/__tests__/**/*.js"
@@ -32,7 +32,6 @@
     "mkdirp": "^0.5.1",
     "mocha": "^2.3.3",
     "ncp": "^2.0.0",
-    "nodemon": "^1.8.0",
     "react-hot-loader": "^2.0.0-alpha-2",
     "sinon": "^1.17.2",
     "webpack": "^1.12.2",
