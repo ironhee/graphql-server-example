@@ -1,5 +1,4 @@
 import React from 'react';
-import Relay from 'react-relay';
 
 class DraftApp extends React.Component {
   render() {
@@ -11,16 +10,4 @@ class DraftApp extends React.Component {
   }
 }
 
-export default Relay.createContainer(DraftApp, {
-  fragments: {
-    draft: () => Relay.QL`
-      fragment on DraftConnection {
-        edges {
-          node {
-            id,
-          },
-        },
-      }
-    `,
-  },
-});
+export default DraftApp;

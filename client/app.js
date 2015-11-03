@@ -15,7 +15,6 @@ ReactDOM.render(
   >
     <Route
       path="/" component={DraftApp}
-      queries={DraftsQueries}
     >
       <IndexRoute
         component={DraftList}
