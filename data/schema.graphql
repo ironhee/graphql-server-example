@@ -1,0 +1,71 @@
+type Draft implements Node {
+  id: ID!
+  content: String
+}
+
+type DraftConnection {
+  pageInfo: PageInfo!
+  edges: [DraftEdge]
+}
+
+input DraftCreateMutationInput {
+  content: String
+  clientMutationId: String!
+}
+
+type DraftCreateMutationPayload {
+  node: Node
+  clientMutationId: String!
+}
+
+type DraftEdge {
+  node: Draft
+  cursor: String!
+}
+
+type DraftMutation {
+  create(input: DraftCreateMutationInput!): DraftCreateMutationPayload
+  remove(input: DraftRemoveMutationInput!): DraftRemoveMutationPayload
+  update(input: DraftUpdateMutationInput!): DraftUpdateMutationPayload
+}
+
+input DraftRemoveMutationInput {
+  id: String
+  clientMutationId: String!
+}
+
+type DraftRemoveMutationPayload {
+  node: Node
+  clientMutationId: String!
+}
+
+input DraftUpdateMutationInput {
+  id: String
+  content: String
+  clientMutationId: String!
+}
+
+type DraftUpdateMutationPayload {
+  node: Node
+  clientMutationId: String!
+}
+
+type Mutation {
+  draft: DraftMutation
+}
+
+interface Node {
+  id: ID!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type RootQueryType {
+  node(id: ID!): Node
+  drafts(before: String, after: String, first: Int, last: Int): DraftConnection
+}

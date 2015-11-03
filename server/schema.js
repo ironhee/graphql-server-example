@@ -160,11 +160,10 @@ const mutationType = new GraphQLObjectType({
   }),
 });
 
+// createResource('Draft', { content: 'bar' });
+// createResource('Draft', { content: 'foo' });
+
 export default new GraphQLSchema({
   query: queryType,
   mutation: mutationType,
 });
-
-
-createResource('Draft', { content: 'bar' });
-createResource('Draft', { content: 'foo' });

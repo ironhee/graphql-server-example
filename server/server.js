@@ -6,23 +6,20 @@ import schema from './schema';
 import jwt from './jwt';
 import graphqlHTTP from 'express-graphql';
 
-const PORT = 3000;
-const JWT_SCRET = 'THIS_IS_SECRET';
-const app = express();
+export const GRAPHQL_PORT = 8000;
+export const JWT_SCRET = 'THIS_IS_SECRET';
 
-app.use(jwt(JWT_SCRET));
-app.use('/graphql', graphqlHTTP(request => ({
+// Expose a GraphQL endpoint
+export const graphQLServer = express();
+graphQLServer.use(jwt(JWT_SCRET));
+graphQLServer.use('/', graphqlHTTP(request => ({
   schema,
+  pretty: true,
   rootValue: {
     uid: request.token ? request.token.uid : null,
   },
   graphiql: true,
 })));
-
-const server = app.listen(PORT, () => {
-  const host = server.address().address;
-  const port = server.address().port;
-
-  console.log('GraphQL listening at http://%s:%s', host, port);
+graphQLServer.listen(GRAPHQL_PORT, () => {
+  console.log(`GraphQL Server is now running on http://localhost:${GRAPHQL_PORT}`);
 });
-

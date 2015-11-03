@@ -1,6 +1,5 @@
 import thinky, { type, r } from './thinky';
 
-
 const Draft = thinky.createModel('Draft', {
   id: type.string().min(2),
   content: type.string(),
