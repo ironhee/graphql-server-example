@@ -7,7 +7,7 @@ class DraftList extends React.Component {
   render() {
     return (
       <div>
-        {_.map(this.props.drafts.edges, (edge) => (
+        {_.map(this.props.viewer.drafts.edges, (edge) => (
           <Draft
             draft={edge.node}
             key={edge.node.id}
@@ -20,12 +20,14 @@ class DraftList extends React.Component {
 
 export default Relay.createContainer(DraftList, {
   fragments: {
-    drafts: () => Relay.QL`
-      fragment on DraftConnection {
-        edges {
-          node {
-            id,
-            ${Draft.getFragment('draft')}
+    viewer: () => Relay.QL`
+      fragment on User {
+        drafts(first: 10) {
+          edges {
+            node {
+              id,
+              ${Draft.getFragment('draft')}
+            },
           },
         },
       }

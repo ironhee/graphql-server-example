@@ -5,9 +5,9 @@ import { r } from '../thinky';
 
 const PREFIX = 'arrayconnection:';
 
-async function indexOfModel(query, modelId) {
+async function indexOfResource(query, resourceId) {
   return (
-    await query.offsetsOf(r.row('id').eq(modelId)).run()
+    await query.offsetsOf(r.row('id').eq(resourceId)).execute()
   )[0];
 }
 
@@ -19,13 +19,13 @@ export function cursorToNodeId(cursor) {
   return unbase64(cursor).substring(PREFIX.length);
 }
 
-export function modelIdToCursor(modelType, modelId) {
-  return nodeIdToCursor(toGlobalId(modelType, modelId));
+export function resourceIdToCursor(resourceType, resourceId) {
+  return nodeIdToCursor(toGlobalId(resourceType, resourceId));
 }
 
-export function cursorToModelId(cursor) {
-  const { id: modelId } = fromGlobalId(cursorToNodeId(cursor));
-  return modelId;
+export function cursorToResourceId(cursor) {
+  const { id: resourceId } = fromGlobalId(cursorToNodeId(cursor));
+  return resourceId;
 }
 
 // https://facebook.github.io/relay/graphql/connections.htm#ApplyCursorsToEdgeOffsets()
@@ -34,16 +34,16 @@ export async function applyCursorsToEdgeOffsets(query, args) {
 
   let afterOffset = 0;
   if (after) {
-    const modelId = cursorToModelId(after);
-    afterOffset = await indexOfModel(query, modelId);
+    const resourceId = cursorToResourceId(after);
+    afterOffset = await indexOfResource(query, resourceId);
     afterOffset = !_.isUndefined(afterOffset) ?
       afterOffset + 1 : 0;
   }
 
   let beforeOffset = null;
   if (before) {
-    const modelId = cursorToModelId(before);
-    beforeOffset = await indexOfModel(query, modelId);
+    const resourceId = cursorToResourceId(before);
+    beforeOffset = await indexOfResource(query, resourceId);
     beforeOffset = !_.isUndefined(beforeOffset) ?
       Math.max(beforeOffset, afterOffset, 0) : null;
   }

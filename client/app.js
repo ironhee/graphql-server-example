@@ -6,7 +6,7 @@ import ReactDOM from 'react-dom';
 import ReactRouterRelay from 'react-router-relay';
 import DraftApp from './components/DraftApp';
 import DraftList from './components/DraftList';
-import DraftsQueries from './queries/DraftsQueries';
+import ViewerQueries from './queries/ViewerQueries';
 
 ReactDOM.render(
   <Router
@@ -14,16 +14,19 @@ ReactDOM.render(
     history={createHashHistory({ queryKey: false })}
   >
     <Route
-      path="/" component={DraftApp}
+      path="/"
+      component={DraftApp}
+      queries={ViewerQueries}
     >
       <IndexRoute
         component={DraftList}
-        queries={DraftsQueries}
+        queries={ViewerQueries}
         prepareParams={() => ({status: 'any'})}
       />
       <Route
-        path=":status" component={DraftList}
-        queries={DraftsQueries}
+        path=":status"
+        component={DraftList}
+        queries={ViewerQueries}
       />
     </Route>
   </Router>,

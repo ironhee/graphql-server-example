@@ -14,7 +14,7 @@ input DraftCreateMutationInput {
 }
 
 type DraftCreateMutationPayload {
-  node: Node
+  draftEdge: DraftEdge
   clientMutationId: String!
 }
 
@@ -23,19 +23,13 @@ type DraftEdge {
   cursor: String!
 }
 
-type DraftMutation {
-  create(input: DraftCreateMutationInput!): DraftCreateMutationPayload
-  remove(input: DraftRemoveMutationInput!): DraftRemoveMutationPayload
-  update(input: DraftUpdateMutationInput!): DraftUpdateMutationPayload
-}
-
 input DraftRemoveMutationInput {
   id: String
   clientMutationId: String!
 }
 
 type DraftRemoveMutationPayload {
-  node: Node
+  draftEdge: DraftEdge
   clientMutationId: String!
 }
 
@@ -46,12 +40,14 @@ input DraftUpdateMutationInput {
 }
 
 type DraftUpdateMutationPayload {
-  node: Node
+  draftEdge: DraftEdge
   clientMutationId: String!
 }
 
 type Mutation {
-  draft: DraftMutation
+  createDraft(input: DraftCreateMutationInput!): DraftCreateMutationPayload
+  updateDraft(input: DraftUpdateMutationInput!): DraftUpdateMutationPayload
+  removeDraft(input: DraftRemoveMutationInput!): DraftRemoveMutationPayload
 }
 
 interface Node {
@@ -67,5 +63,10 @@ type PageInfo {
 
 type RootQueryType {
   node(id: ID!): Node
+  viewer: User
+}
+
+type User implements Node {
+  id: ID!
   drafts(before: String, after: String, first: Int, last: Int): DraftConnection
 }
