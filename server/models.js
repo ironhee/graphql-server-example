@@ -17,7 +17,11 @@ Draft.hasMany(Revision, 'revisions', 'id', 'draftId');
 Revision.belongsTo(Draft, 'draft', 'draftId', 'id');
 
 
-export default {
+export const models = {
   Draft,
   Revision,
 };
+
+export function getModel(modelName) {
+  return models[modelName];
+}

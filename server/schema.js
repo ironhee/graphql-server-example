@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import {
   GraphQLObjectType,
   GraphQLSchema,
@@ -10,33 +11,23 @@ import {
   connectionArgs,
   globalIdField,
   fromGlobalId,
-  connectionFromArraySlice,
-  getOffsetWithDefault,
   mutationWithClientMutationId,
 } from 'graphql-relay';
 
 import {
-  getResource,
-  getResources,
-  createResource,
-  removeResource,
-  updateResource,
-} from './rethinkdb';
+  modelIdToCursor,
+  applyCursorsToEdgeOffsets,
+  edgeOffsetsToReturn,
+} from './lib/arrayConnection';
 
-
-function getOffsetsFromConnectionArgs(args) {
-  const { after, first = 10 } = args;
-  const afterOffset = getOffsetWithDefault(after, -1);
-
-  const startOffset = Math.max(afterOffset, -1) + 1;
-  const endOffset = startOffset + first;
-  return { startOffset, endOffset };
-}
+import { getModel } from './models';
+import { r } from './thinky';
 
 const {nodeInterface, nodeField} = nodeDefinitions(
-  (globalId) => {
+  async (globalId) => {
     const {type, id} = fromGlobalId(globalId);
-    return getResource(type, id) || null;
+    const model = await getModel(type).get(id).run();
+    return model || null;
   },
   (obj) => {
     switch (obj.type) {
@@ -69,19 +60,41 @@ const queryType = new GraphQLObjectType({
     drafts: {
       type: draftConnection,
       args: connectionArgs,
-      resolve: (root, args) => {
-        const { startOffset, endOffset } = getOffsetsFromConnectionArgs(args);
-        // to calculate hasNext, fetch one more resource.
-        return getResources('Draft', startOffset, endOffset + 1).then(resources => {
-          return connectionFromArraySlice(
-            resources,
-            args,
-            {
-              sliceStart: startOffset,
-              arrayLength: startOffset + resources.length,
-            }
-          );
-        });
+      resolve: async (root, args) => {
+        const { after, before, last } = args;
+        let { first } = args;
+        if (!first && !last) { first = 1; }
+
+        const query = r.table('Draft').orderBy(r.desc('date'));
+
+        const { afterOffset, beforeOffset } =
+          await applyCursorsToEdgeOffsets(query, { after, before });
+        const { startOffset, endOffset } =
+          await edgeOffsetsToReturn({ afterOffset, beforeOffset }, { first, last });
+
+        if (endOffset === null) { throw Error('using last without before is not supported yet.'); }
+
+        // endOffset + 1 is trick for check whether rows remain or not.
+        const resources = await query.slice(startOffset, endOffset + 1).run();
+
+        const edgesSize = endOffset - startOffset;
+        const edges = resources.slice(0, edgesSize).map((resource) => ({
+          cursor: modelIdToCursor('Draft', resource.id),
+          node: resource,
+        }));
+        const firstEdge = _.first(edges);
+        const lastEdge = _.last(edges);
+        const lowerBound = after ? (afterOffset + 1) : 0;
+        const upperBound = before ? beforeOffset : startOffset + resources.length;
+        return {
+          edges,
+          pageInfo: {
+            startCursor: firstEdge ? firstEdge.cursor : null,
+            endCursor: lastEdge ? lastEdge.cursor : null,
+            hasPreviousPage: last !== null ? startOffset > lowerBound : false,
+            hasNextPage: first !== null ? endOffset < upperBound : false,
+          },
+        };
       },
     },
   },
@@ -103,8 +116,11 @@ const draftMutationType = new GraphQLObjectType({
           resolve: (payload) => payload,
         },
       },
-      mutateAndGetPayload: ({ content }) => {
-        return createResource('Draft', { content });
+      mutateAndGetPayload: async ({ content }) => {
+        const Model = getModel('Draft');
+        const model = new Model({ content });
+        await model.saveAll();
+        return model;
       },
     }),
     remove: mutationWithClientMutationId({
@@ -120,9 +136,10 @@ const draftMutationType = new GraphQLObjectType({
           resolve: (payload) => payload,
         },
       },
-      mutateAndGetPayload: ({ id: globalId }) => {
+      mutateAndGetPayload: async ({ id: globalId }) => {
         const {id} = fromGlobalId(globalId);
-        removeResource('Draft', id);
+        const resource = await r.table('Draft').get(id).run();
+        await resource.purge();
         return null;
       },
     }),
@@ -142,9 +159,12 @@ const draftMutationType = new GraphQLObjectType({
           resolve: (payload) => payload,
         },
       },
-      mutateAndGetPayload: ({ id: globalId, content }) => {
+      mutateAndGetPayload: async ({ id: globalId, content }) => {
         const {id} = fromGlobalId(globalId);
-        return updateResource('Draft', id, { content });
+        const model = await r.table('Draft').get(id).run();
+        _.assign(model, { content });
+        await model.saveAll();
+        return model;
       },
     }),
   }),

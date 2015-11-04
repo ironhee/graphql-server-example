@@ -25,6 +25,7 @@
     "babel-relay-plugin": "^0.3.0",
     "babel-relay-plugin-loader": "^0.3.1",
     "chai": "^3.4.0",
+    "del": "^2.0.2",
     "eslint": "^1.7.2",
     "eslint-config-airbnb": "^0.1.0",
     "eslint-plugin-react": "^3.6.3",
