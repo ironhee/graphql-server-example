@@ -81,6 +81,42 @@ export class Endpoint {
     await resource.saveAll();
     return resource;
   }
+
+  async getConnection(args) {
+    const { after, before, last } = args;
+    let { first } = args;
+    if (!first && !last) { first = 10; }
+
+    const query = this.Model.orderBy(r.desc('createdAt'));
+
+    const { afterOffset, beforeOffset } =
+      await applyCursorsToEdgeOffsets(query, { after, before });
+    const { startOffset, endOffset } =
+      await edgeOffsetsToReturn({ afterOffset, beforeOffset }, { first, last });
+
+    if (endOffset === null) { throw Error('using last without before is not supported yet.'); }
+
+    // endOffset + 1 is trick for check whether rows remain or not.
+    const resources = await query.slice(startOffset, endOffset + 1).run();
+
+    const edgesSize = endOffset - startOffset;
+    const edges = resources.slice(0, edgesSize).map((resource) =>
+      resourceToEdge(resource));
+
+    const firstEdge = _.first(edges);
+    const lastEdge = _.last(edges);
+    const lowerBound = after ? (afterOffset + 1) : 0;
+    const upperBound = before ? beforeOffset : startOffset + resources.length;
+    return {
+      edges,
+      pageInfo: {
+        startCursor: firstEdge ? firstEdge.cursor : null,
+        endCursor: lastEdge ? lastEdge.cursor : null,
+        hasPreviousPage: last !== null ? startOffset > lowerBound : false,
+        hasNextPage: first !== null ? endOffset < upperBound : false,
+      },
+    };
+  }
 }
 
 function createGraphQLType(name, fields) {
@@ -109,40 +145,7 @@ function createConnectionField(endpoint) {
   return {
     type: endpoint.graphQLConnectionType,
     args: connectionArgs,
-    resolve: async (root, args) => {
-      const { after, before, last } = args;
-      let { first } = args;
-      if (!first && !last) { first = 10; }
-
-      const query = endpoint.Model.orderBy(r.desc('createdAt'));
-
-      const { afterOffset, beforeOffset } =
-        await applyCursorsToEdgeOffsets(query, { after, before });
-      const { startOffset, endOffset } =
-        await edgeOffsetsToReturn({ afterOffset, beforeOffset }, { first, last });
-
-      if (endOffset === null) { throw Error('using last without before is not supported yet.'); }
-
-      // endOffset + 1 is trick for check whether rows remain or not.
-      const resources = await query.slice(startOffset, endOffset + 1).run();
-
-      const edgesSize = endOffset - startOffset;
-      const edges = resources.slice(0, edgesSize).map((resource) =>
-        resourceToEdge(resource));
-
-      const firstEdge = _.first(edges);
-      const lastEdge = _.last(edges);
-      const lowerBound = after ? (afterOffset + 1) : 0;
-      const upperBound = before ? beforeOffset : startOffset + resources.length;
-      return {
-        edges,
-        pageInfo: {
-          startCursor: firstEdge ? firstEdge.cursor : null,
-          endCursor: lastEdge ? lastEdge.cursor : null,
-          hasPreviousPage: last !== null ? startOffset > lowerBound : false,
-          hasNextPage: first !== null ? endOffset < upperBound : false,
-        },
-      };
-    },
+    resolve: async (root, { after, first, before, last }) =>
+      await endpoint.getConnection({ after, first, before, last }),
   };
 }
