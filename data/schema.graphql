@@ -16,7 +16,6 @@ input DraftCreateInput {
 
 type DraftCreatePayload {
   draftEdge: DraftEdge
-  viewer: User
   clientMutationId: String!
 }
 
@@ -32,7 +31,6 @@ input DraftRemoveInput {
 
 type DraftRemovePayload {
   draftEdge: DraftEdge
-  viewer: User
   clientMutationId: String!
 }
 
@@ -64,12 +62,11 @@ type PageInfo {
   endCursor: String
 }
 
-type RootQueryType {
-  node(id: ID!): Node
-  viewer: User
+type Pool {
+  drafts(after: String, first: Int, before: String, last: Int): DraftConnection
 }
 
-type User implements Node {
-  id: ID!
-  drafts(after: String, first: Int, before: String, last: Int): DraftConnection
+type Query {
+  node(id: ID!): Node
+  pool: Pool
 }

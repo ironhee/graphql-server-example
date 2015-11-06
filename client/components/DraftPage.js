@@ -11,7 +11,7 @@ class DraftPage extends React.Component {
 
   saveDraft(content) {
     Relay.Store.update(
-      new CreateDraftMutation({ content, viewer: this.props.viewer })
+      new CreateDraftMutation({ content })
     );
   }
 
@@ -21,7 +21,7 @@ class DraftPage extends React.Component {
         <DraftInput onSave={ (content) => this.saveDraft(content) } />
         <DraftList
           ref="list"
-          viewer={ this.props.viewer }
+          pool={ this.props.pool }
         />
       </div>
     );
@@ -30,10 +30,9 @@ class DraftPage extends React.Component {
 
 export default Relay.createContainer(DraftPage, {
   fragments: {
-    viewer: () => Relay.QL`
-      fragment on User {
-        ${DraftList.getFragment('viewer')}
-        ${CreateDraftMutation.getFragment('viewer')}
+    pool: () => Relay.QL`
+      fragment on Pool {
+        ${DraftList.getFragment('pool')}
       }
     `,
   },

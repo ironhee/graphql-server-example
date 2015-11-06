@@ -17,7 +17,7 @@ class DraftList extends React.Component {
   }
 
   renderDrafts() {
-    return _.chain(this.props.viewer.drafts.edges)
+    return _.chain(this.props.pool.drafts.edges)
     .map(edge => edge.node)
     .map(node =>
       <Draft
@@ -47,9 +47,8 @@ export default Relay.createContainer(DraftList, {
   },
 
   fragments: {
-    viewer: () => Relay.QL`
-      fragment on User {
-        id,
+    pool: () => Relay.QL`
+      fragment on Pool {
         drafts(after: $cursor, first: $limit) {
           edges {
             cursor

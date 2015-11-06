@@ -1,11 +1,11 @@
 import 'babel/polyfill';
-import {createHashHistory} from 'history';
-import {IndexRoute, Route, Router} from 'react-router';
+import { createHashHistory } from 'history';
+import { Route, Router } from 'react-router';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactRouterRelay from 'react-router-relay';
 import DraftPage from './components/DraftPage';
-import ViewerQueries from './queries/ViewerQueries';
+import PoolQueries from './queries/PoolQueries';
 
 ReactDOM.render(
   <Router
@@ -15,7 +15,7 @@ ReactDOM.render(
     <Route
       path="/"
       component={DraftPage}
-      queries={ViewerQueries}
+      queries={PoolQueries}
     />
   </Router>,
   document.getElementById('app')

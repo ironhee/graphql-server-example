@@ -1,14 +1,6 @@
 import Relay from 'react-relay';
 
 export default class CreateDraftMutation extends Relay.Mutation {
-  static fragments = {
-    viewer: () => Relay.QL`
-      fragment on User {
-        id
-      }
-    `,
-  };
-
   getMutation() {
     return Relay.QL`
       mutation {
@@ -21,7 +13,6 @@ export default class CreateDraftMutation extends Relay.Mutation {
     return Relay.QL`
       fragment on DraftCreatePayload {
         draftEdge
-        viewer
       }
     `;
   }

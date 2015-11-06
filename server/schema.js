@@ -26,19 +26,6 @@ import {
 import { getModel } from './models';
 import { r } from './thinky';
 
-const getViewer = async () => {
-  const resources = await getModel('User').run();
-  let resource;
-  if (_.isEmpty(resources)) {
-    const Model = getModel('User');
-    resource = new Model({});
-    await resource.saveAll();
-  } else {
-    resource = resources[0];
-  }
-  return resource;
-};
-
 const {nodeInterface, nodeField} = nodeDefinitions(
   async (globalId) => {
     const {type, id} = fromGlobalId(globalId);
@@ -50,8 +37,6 @@ const {nodeInterface, nodeField} = nodeDefinitions(
       switch (obj.getModel().getTableName()) {
       case 'Draft':
         return GraphQLDraft;
-      case 'User':
-        return GraphQLUser;
       default:
         return null;
       }
@@ -82,10 +67,76 @@ const {
   nodeType: GraphQLDraft,
 });
 
-const GraphQLUser = new GraphQLObjectType({
-  name: 'User',
+const GraphQLDraftCreateMutation = mutationWithClientMutationId({
+  name: 'DraftCreate',
+  inputFields: {
+    content: {
+      type: GraphQLString,
+    },
+  },
+  outputFields: {
+    draftEdge: {
+      type: GraphQLDraftEdge,
+      resolve: ({ resource }) => resourceToEdge(resource),
+    },
+  },
+  mutateAndGetPayload: async ({ content }) => {
+    const Model = getModel('Draft');
+    const resource = new Model({ content });
+    await resource.saveAll();
+    return { resource };
+  },
+});
+
+const GraphQLDraftRemoveMutation = mutationWithClientMutationId({
+  name: 'DraftRemove',
+  inputFields: {
+    id: {
+      type: GraphQLString,
+    },
+  },
+  outputFields: {
+    draftEdge: {
+      type: GraphQLDraftEdge,
+      resolve: () => null,
+    },
+  },
+  mutateAndGetPayload: async ({ id: globalId }) => {
+    const {id} = fromGlobalId(globalId);
+    const resource = await getModel('Draft').get(id).run();
+    await resource.purge();
+    return null;
+  },
+});
+
+const GraphQLDraftUpdateMutation = mutationWithClientMutationId({
+  name: 'DraftUpdate',
+  inputFields: {
+    id: {
+      type: GraphQLString,
+    },
+    content: {
+      type: GraphQLString,
+    },
+  },
+  outputFields: {
+    draftEdge: {
+      type: GraphQLDraftEdge,
+      resolve: (resource) => resourceToEdge(resource),
+    },
+  },
+  mutateAndGetPayload: async ({ id: globalId, content }) => {
+    const {id} = fromGlobalId(globalId);
+    const resource = await getModel('Draft').get(id).run();
+    _.assign(resource, { content });
+    await resource.saveAll();
+    return resource;
+  },
+});
+
+const GraphQLPool = new GraphQLObjectType({
+  name: 'Pool',
   fields: {
-    id: globalIdField('User'),
     drafts: {
       type: DraftConnection,
       args: connectionArgs,
@@ -126,91 +177,15 @@ const GraphQLUser = new GraphQLObjectType({
       },
     },
   },
-  interfaces: [nodeInterface],
 });
 
-const GraphQLDraftCreateMutation = mutationWithClientMutationId({
-  name: 'DraftCreate',
-  inputFields: {
-    content: {
-      type: GraphQLString,
-    },
-  },
-  outputFields: {
-    draftEdge: {
-      type: GraphQLDraftEdge,
-      resolve: ({ resource }) => resourceToEdge(resource),
-    },
-    viewer: {
-      type: GraphQLUser,
-      resolve: async () => await getViewer(),
-    },
-  },
-  mutateAndGetPayload: async ({ content }) => {
-    const Model = getModel('Draft');
-    const resource = new Model({ content });
-    await resource.saveAll();
-    return { resource };
-  },
-});
-
-const GraphQLDraftRemoveMutation = mutationWithClientMutationId({
-  name: 'DraftRemove',
-  inputFields: {
-    id: {
-      type: GraphQLString,
-    },
-  },
-  outputFields: {
-    draftEdge: {
-      type: GraphQLDraftEdge,
-      resolve: () => null,
-    },
-    viewer: {
-      type: GraphQLUser,
-      resolve: async () => await getViewer(),
-    },
-  },
-  mutateAndGetPayload: async ({ id: globalId }) => {
-    const {id} = fromGlobalId(globalId);
-    const resource = await getModel('Draft').get(id).run();
-    await resource.purge();
-    return null;
-  },
-});
-
-const GraphQLDraftUpdateMutation = mutationWithClientMutationId({
-  name: 'DraftUpdate',
-  inputFields: {
-    id: {
-      type: GraphQLString,
-    },
-    content: {
-      type: GraphQLString,
-    },
-  },
-  outputFields: {
-    draftEdge: {
-      type: GraphQLDraftEdge,
-      resolve: (resource) => resourceToEdge(resource),
-    },
-  },
-  mutateAndGetPayload: async ({ id: globalId, content }) => {
-    const {id} = fromGlobalId(globalId);
-    const resource = await getModel('Draft').get(id).run();
-    _.assign(resource, { content });
-    await resource.saveAll();
-    return resource;
-  },
-});
-
-const Root = new GraphQLObjectType({
-  name: 'RootQueryType',
+const Query = new GraphQLObjectType({
+  name: 'Query',
   fields: {
     node: nodeField,
-    viewer: {
-      type: GraphQLUser,
-      resolve: async () => await getViewer(),
+    pool: {
+      type: GraphQLPool,
+      resolve: () => ({}),
     },
   },
 });
@@ -225,6 +200,6 @@ const Mutation = new GraphQLObjectType({
 });
 
 export default new GraphQLSchema({
-  query: Root,
+  query: Query,
   mutation: Mutation,
 });
