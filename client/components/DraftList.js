@@ -1,5 +1,6 @@
 import React from 'react';
 import Relay from 'react-relay';
+import _ from 'lodash';
 import Draft from './Draft';
 
 const PAGE_SIZE = 5;
@@ -9,19 +10,22 @@ class DraftList extends React.Component {
     super(props);
   }
 
-  queryNextPage() {
+  queryNextPage(pageSize = PAGE_SIZE) {
     this.props.relay.setVariables({
-      first: this.props.relay.variables.first + PAGE_SIZE,
+      limit: this.props.relay.variables.limit + pageSize,
     });
   }
 
   renderDrafts() {
-    return this.props.viewer.drafts.edges.map(edge =>
+    return _.chain(this.props.viewer.drafts.edges)
+    .map(edge => edge.node)
+    .map(node =>
       <Draft
-        key={edge.node.id}
-        draft={edge.node}
+        key={node.id}
+        draft={node}
       />
-    );
+    )
+    .value();
   }
 
   render() {
@@ -38,17 +42,21 @@ class DraftList extends React.Component {
 
 export default Relay.createContainer(DraftList, {
   initialVariables: {
-    first: PAGE_SIZE,
+    cursor: null,
+    limit: PAGE_SIZE,
   },
+
   fragments: {
     viewer: () => Relay.QL`
       fragment on User {
         id,
-        drafts(first: $first) {
+        drafts(after: $cursor, first: $limit) {
           edges {
             cursor
             node {
               id
+              content
+              createdAt
               ${Draft.getFragment('draft')}
             },
           },

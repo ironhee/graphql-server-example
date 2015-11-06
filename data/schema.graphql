@@ -1,6 +1,7 @@
 type Draft implements Node {
   id: ID!
   content: String
+  createdAt: String
 }
 
 type DraftConnection {

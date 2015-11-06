@@ -8,6 +8,7 @@ export default class CreateDraftMutation extends Relay.Mutation {
       }
     `,
   };
+
   getMutation() {
     return Relay.QL`
       mutation {
@@ -15,6 +16,7 @@ export default class CreateDraftMutation extends Relay.Mutation {
       }
     `;
   }
+
   getFatQuery() {
     return Relay.QL`
       fragment on DraftCreatePayload {
@@ -23,23 +25,17 @@ export default class CreateDraftMutation extends Relay.Mutation {
       }
     `;
   }
+
   getConfigs() {
-    return [{
-      type: 'RANGE_ADD',
-      parentName: 'viewer',
-      parentID: this.props.viewer.id,
-      connectionName: 'drafts',
-      edgeName: 'draftEdge',
-      rangeBehaviors: {
-        '': 'append',
-      },
-    }];
+    return [];
   }
+
   getVariables() {
     return {
       content: this.props.content,
     };
   }
+
   getOptimisticResponse() {
     return {
       draftEdge: {

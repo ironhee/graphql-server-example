@@ -5,6 +5,10 @@ import DraftList from './DraftList';
 import CreateDraftMutation from '../mutations/CreateDraftMutation';
 
 class DraftPage extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
   saveDraft(content) {
     Relay.Store.update(
       new CreateDraftMutation({ content, viewer: this.props.viewer })
@@ -15,7 +19,10 @@ class DraftPage extends React.Component {
     return (
       <div>
         <DraftInput onSave={ (content) => this.saveDraft(content) } />
-        <DraftList viewer={ this.props.viewer }/>
+        <DraftList
+          ref="list"
+          viewer={ this.props.viewer }
+        />
       </div>
     );
   }

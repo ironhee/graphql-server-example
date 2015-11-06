@@ -67,6 +67,9 @@ const GraphQLDraft = new GraphQLObjectType({
     content: {
       type: GraphQLString,
     },
+    createdAt: {
+      type: GraphQLString,
+    },
   },
   interfaces: [nodeInterface],
 });
