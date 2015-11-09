@@ -7,7 +7,8 @@
     "build": "$(npm bin)/babel-node tools/run.js build",
     "build-watch": "$(npm bin)/babel-node tools/run.js serve",
     "update-schema": "$(npm bin)/babel-node tools/run.js updateSchema",
-    "start": "npm run server && npm run build-watch"
+    "start": "npm run server && npm run build-watch",
+    "lint": "$(npm bin)/eslint server client"
   },
   "options": {
     "mocha": "--stage 0 --compilers js:babel/register server/**/__tests__/**/*.js"
