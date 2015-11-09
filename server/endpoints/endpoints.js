@@ -36,7 +36,7 @@ export const {nodeInterface, nodeField} = nodeDefinitions(
   async (globalId) => {
     const { type: name, id } = fromGlobalId(globalId);
     const endpoint = getEndpoint(name);
-    const resource = await endpoint.get(id);
+    const resource = await endpoint.get(id).getJoin().run();
     return resource || null;
   },
   (obj) => {
@@ -61,25 +61,18 @@ export class Endpoint {
   }
 
   async get(id) {
-    return await this.Model.get(id).run();
+    return await this.Model.get(id).getJoin().run();
   }
 
   async create(attributes) {
     const resource = new this.Model(attributes);
-    await resource.saveAll();
-    return { resource };
+    await resource.save();
+    return resource;
   }
 
   async remove(id) {
     const resource = await this.Model.get(id).run();
     await resource.purge();
-  }
-
-  async update(id, attributes) {
-    const resource = await this.Model.get(id).run();
-    _.assign(resource, attributes);
-    await resource.saveAll();
-    return resource;
   }
 
   async getConnection(args) {
@@ -97,7 +90,7 @@ export class Endpoint {
     if (endOffset === null) { throw Error('using last without before is not supported yet.'); }
 
     // endOffset + 1 is trick for check whether rows remain or not.
-    const resources = await query.slice(startOffset, endOffset + 1).run();
+    const resources = await query.slice(startOffset, endOffset + 1).getJoin().run();
 
     const edgesSize = endOffset - startOffset;
     const edges = resources.slice(0, edgesSize).map((resource) =>

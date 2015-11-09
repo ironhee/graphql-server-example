@@ -5,6 +5,7 @@ import {
 import { nodeField } from './endpoints/endpoints';
 import {
   graphQLConnectionField as graphQLDraftConnectionField,
+  graphQLReviseMutation as graphQLDraftReviseMutation,
   graphQLCreateMutation as graphQLDraftCreateMutation,
   graphQLUpdateMutation as graphQLDraftUpdateMutation,
   graphQLRemoveMutation as graphQLDraftRemoveMutation,
@@ -32,6 +33,7 @@ const Query = new GraphQLObjectType({
 const Mutation = new GraphQLObjectType({
   name: 'Mutation',
   fields: () => ({
+    reviseDraft: graphQLDraftReviseMutation,
     createDraft: graphQLDraftCreateMutation,
     updateDraft: graphQLDraftUpdateMutation,
     removeDraft: graphQLDraftRemoveMutation,

@@ -1,7 +1,8 @@
 type Draft implements Node {
   id: ID!
-  content: String
-  createdAt: String
+  content: String!
+  createdAt: String!
+  revision: Revision
 }
 
 type DraftConnection {
@@ -10,7 +11,7 @@ type DraftConnection {
 }
 
 input DraftCreateInput {
-  content: String
+  content: String!
   clientMutationId: String!
 }
 
@@ -25,7 +26,7 @@ type DraftEdge {
 }
 
 input DraftRemoveInput {
-  id: String
+  id: String!
   clientMutationId: String!
 }
 
@@ -34,8 +35,19 @@ type DraftRemovePayload {
   clientMutationId: String!
 }
 
+input DraftReviseInput {
+  id: String!
+  content: String!
+  clientMutationId: String!
+}
+
+type DraftRevisePayload {
+  draft: Draft
+  clientMutationId: String!
+}
+
 input DraftUpdateInput {
-  id: String
+  id: String!
   content: String
   clientMutationId: String!
 }
@@ -46,6 +58,7 @@ type DraftUpdatePayload {
 }
 
 type Mutation {
+  reviseDraft(input: DraftReviseInput!): DraftRevisePayload
   createDraft(input: DraftCreateInput!): DraftCreatePayload
   updateDraft(input: DraftUpdateInput!): DraftUpdatePayload
   removeDraft(input: DraftRemoveInput!): DraftRemovePayload
@@ -69,4 +82,10 @@ type Pool {
 type Query {
   node(id: ID!): Node
   pool: Pool
+}
+
+type Revision implements Node {
+  id: ID!
+  content: String
+  createdAt: String
 }
