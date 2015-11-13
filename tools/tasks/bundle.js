@@ -19,7 +19,10 @@ function bundle() {
 
     if (global.WATCH) {
       const server = new WebpackDevServer(bundler, {
-        proxy: {'/graphql': `http://localhost:${GRAPHQL_PORT}`},
+        proxy: {
+          '/auth': `http://localhost:${GRAPHQL_PORT}`,
+          '/graphql': `http://localhost:${GRAPHQL_PORT}`,
+        },
         contentBase: path.resolve(__dirname, '../../static'),
         publicPath: '/static/',
         hot: true,

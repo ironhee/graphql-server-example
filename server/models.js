@@ -13,6 +13,12 @@ const Revision = thinky.createModel('Revision', {
   createdAt: type.date().default(r.now()),
 });
 
+const User = thinky.createModel('User', {
+  id: type.string().min(2),
+  name: type.string(),
+  createdAt: type.date().default(r.now()),
+});
+
 
 Draft.hasOne(Revision, 'revision', 'id', 'draftId');
 Revision.belongsTo(Draft, 'draft', 'draftId', 'id');
@@ -21,6 +27,7 @@ Revision.belongsTo(Draft, 'draft', 'draftId', 'id');
 export const models = {
   Draft,
   Revision,
+  User,
 };
 
 export function getModel(modelName) {

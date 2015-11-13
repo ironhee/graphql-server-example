@@ -3,7 +3,6 @@ import {
 } from 'graphql';
 import { createEndpoint } from './endpoints';
 
-
 const NAME = 'Revision';
 
 export const revisionEndpoint = createEndpoint(NAME, {
@@ -16,8 +15,8 @@ export const revisionEndpoint = createEndpoint(NAME, {
 });
 
 export const {
-  graphQLType,
-  graphQLConnectionType,
-  graphQLEdgeType,
-  graphQLConnectionField,
+  GraphQLType,
+  GraphQLConnectionType,
+  GraphQLEdgeType,
+  GraphQLConnectionField,
 } = revisionEndpoint;

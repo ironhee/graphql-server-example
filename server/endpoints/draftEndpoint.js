@@ -12,7 +12,7 @@ import {
 import { createEndpoint } from './endpoints';
 import {
   revisionEndpoint,
-  graphQLType as revisionType,
+  GraphQLType as revisionType,
 } from './revisionEndpoint';
 
 
@@ -31,13 +31,13 @@ export const draftEndpoint = createEndpoint(NAME, {
 });
 
 export const {
-  graphQLType,
-  graphQLConnectionType,
-  graphQLEdgeType,
-  graphQLConnectionField,
+  GraphQLType,
+  GraphQLConnectionType,
+  GraphQLEdgeType,
+  GraphQLConnectionField,
 } = draftEndpoint;
 
-export const graphQLReviseMutation = mutationWithClientMutationId({
+export const GraphQLReviseMutation = mutationWithClientMutationId({
   name: NAME + 'Revise',
   inputFields: {
     id: {
@@ -49,7 +49,7 @@ export const graphQLReviseMutation = mutationWithClientMutationId({
   },
   outputFields: {
     draft: {
-      type: graphQLType,
+      type: GraphQLType,
     },
   },
   mutateAndGetPayload: async ({ id: draftGlobalId, content }) => {
@@ -72,7 +72,7 @@ export const graphQLReviseMutation = mutationWithClientMutationId({
   },
 });
 
-export const graphQLCreateMutation = mutationWithClientMutationId({
+export const GraphQLCreateMutation = mutationWithClientMutationId({
   name: NAME + 'Create',
   inputFields: {
     content: {
@@ -81,7 +81,7 @@ export const graphQLCreateMutation = mutationWithClientMutationId({
   },
   outputFields: {
     draftEdge: {
-      type: graphQLEdgeType,
+      type: GraphQLEdgeType,
       resolve: ({ resource }) => resourceToEdge(resource),
     },
   },
@@ -93,7 +93,7 @@ export const graphQLCreateMutation = mutationWithClientMutationId({
   },
 });
 
-export const graphQLRemoveMutation = mutationWithClientMutationId({
+export const GraphQLRemoveMutation = mutationWithClientMutationId({
   name: NAME + 'Remove',
   inputFields: {
     id: {
@@ -102,7 +102,7 @@ export const graphQLRemoveMutation = mutationWithClientMutationId({
   },
   outputFields: {
     draftEdge: {
-      type: graphQLEdgeType,
+      type: GraphQLEdgeType,
       resolve: () => null,
     },
   },
@@ -112,7 +112,7 @@ export const graphQLRemoveMutation = mutationWithClientMutationId({
   },
 });
 
-export const graphQLUpdateMutation = mutationWithClientMutationId({
+export const GraphQLUpdateMutation = mutationWithClientMutationId({
   name: NAME + 'Update',
   inputFields: {
     id: {
@@ -124,7 +124,7 @@ export const graphQLUpdateMutation = mutationWithClientMutationId({
   },
   outputFields: {
     draftEdge: {
-      type: graphQLEdgeType,
+      type: GraphQLEdgeType,
       resolve: (resource) => resourceToEdge(resource),
     },
   },

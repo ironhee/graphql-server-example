@@ -8,6 +8,7 @@ import {
   connectionArgs,
   globalIdField,
   fromGlobalId,
+  toGlobalId,
 } from 'graphql-relay';
 import { getModel } from '../models';
 import { r } from '../thinky';
@@ -45,7 +46,7 @@ export const {nodeInterface, nodeField} = nodeDefinitions(
     }
     const name = obj.getModel().getTableName();
     const endpoint = getEndpoint(name);
-    return endpoint.graphQLType;
+    return endpoint.GraphQLType;
   }
 );
 
@@ -53,11 +54,20 @@ export class Endpoint {
   constructor(name, fields) {
     this.name = name;
     this.Model = getModel(this.name);
-    this.graphQLType = createGraphQLType(name, fields);
-    const { graphQLConnectionType, graphQLEdgeType } = createConnectionDefinitions(name, this.graphQLType);
-    this.graphQLConnectionType = graphQLConnectionType;
-    this.graphQLEdgeType = graphQLEdgeType;
-    this.graphQLConnectionField = createConnectionField(this);
+    this.GraphQLType = createGraphQLType(name, fields);
+    const { GraphQLConnectionType, GraphQLEdgeType } = createConnectionDefinitions(name, this.GraphQLType);
+    this.GraphQLConnectionType = GraphQLConnectionType;
+    this.GraphQLEdgeType = GraphQLEdgeType;
+    this.GraphQLConnectionField = createConnectionField(this);
+  }
+
+  toGlobalId(id) {
+    return toGlobalId(this.name, id);
+  }
+
+  fromGlobalId(globalId) {
+    const { id } = fromGlobalId(globalId);
+    return id;
   }
 
   async get(id) {
@@ -123,20 +133,20 @@ function createGraphQLType(name, fields) {
   });
 }
 
-function createConnectionDefinitions(name, graphQLType) {
+function createConnectionDefinitions(name, GraphQLType) {
   const {
-    connectionType: graphQLConnectionType,
-    edgeType: graphQLEdgeType,
+    connectionType: GraphQLConnectionType,
+    edgeType: GraphQLEdgeType,
   } = connectionDefinitions({
     name: name,
-    nodeType: graphQLType,
+    nodeType: GraphQLType,
   });
-  return { graphQLConnectionType, graphQLEdgeType };
+  return { GraphQLConnectionType, GraphQLEdgeType };
 }
 
 function createConnectionField(endpoint) {
   return {
-    type: endpoint.graphQLConnectionType,
+    type: endpoint.GraphQLConnectionType,
     args: connectionArgs,
     resolve: async (root, { after, first, before, last }) =>
       await endpoint.getConnection({ after, first, before, last }),

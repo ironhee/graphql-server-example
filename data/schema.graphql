@@ -77,6 +77,8 @@ type PageInfo {
 
 type Pool {
   drafts(after: String, first: Int, before: String, last: Int): DraftConnection
+  revision(after: String, first: Int, before: String, last: Int): RevisionConnection
+  user(after: String, first: Int, before: String, last: Int): UserConnection
 }
 
 type Query {
@@ -88,4 +90,30 @@ type Revision implements Node {
   id: ID!
   content: String
   createdAt: String
+}
+
+type RevisionConnection {
+  pageInfo: PageInfo!
+  edges: [RevisionEdge]
+}
+
+type RevisionEdge {
+  node: Revision
+  cursor: String!
+}
+
+type User implements Node {
+  id: ID!
+  name: String
+  createdAt: String
+}
+
+type UserConnection {
+  pageInfo: PageInfo!
+  edges: [UserEdge]
+}
+
+type UserEdge {
+  node: User
+  cursor: String!
 }

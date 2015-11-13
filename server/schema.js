@@ -4,18 +4,25 @@ import {
 } from 'graphql';
 import { nodeField } from './endpoints/endpoints';
 import {
-  graphQLConnectionField as graphQLDraftConnectionField,
-  graphQLReviseMutation as graphQLDraftReviseMutation,
-  graphQLCreateMutation as graphQLDraftCreateMutation,
-  graphQLUpdateMutation as graphQLDraftUpdateMutation,
-  graphQLRemoveMutation as graphQLDraftRemoveMutation,
+  GraphQLConnectionField as GraphQLDraftConnectionField,
+  GraphQLReviseMutation as GraphQLDraftReviseMutation,
+  GraphQLCreateMutation as GraphQLDraftCreateMutation,
+  GraphQLUpdateMutation as GraphQLDraftUpdateMutation,
+  GraphQLRemoveMutation as GraphQLDraftRemoveMutation,
 } from './endpoints/draftEndpoint';
-
+import {
+  GraphQLConnectionField as GraphQLRevisionConnectionField,
+} from './endpoints/revisionEndpoint';
+import {
+  GraphQLConnectionField as GraphQLUserConnectionField,
+} from './endpoints/userEndpoint';
 
 const GraphQLPool = new GraphQLObjectType({
   name: 'Pool',
   fields: {
-    drafts: graphQLDraftConnectionField,
+    drafts: GraphQLDraftConnectionField,
+    revision: GraphQLRevisionConnectionField,
+    user: GraphQLUserConnectionField,
   },
 });
 
@@ -33,10 +40,10 @@ const Query = new GraphQLObjectType({
 const Mutation = new GraphQLObjectType({
   name: 'Mutation',
   fields: () => ({
-    reviseDraft: graphQLDraftReviseMutation,
-    createDraft: graphQLDraftCreateMutation,
-    updateDraft: graphQLDraftUpdateMutation,
-    removeDraft: graphQLDraftRemoveMutation,
+    reviseDraft: GraphQLDraftReviseMutation,
+    createDraft: GraphQLDraftCreateMutation,
+    updateDraft: GraphQLDraftUpdateMutation,
+    removeDraft: GraphQLDraftRemoveMutation,
   }),
 });
 
