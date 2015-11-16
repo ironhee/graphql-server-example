@@ -2,7 +2,7 @@ import path from 'path';
 import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
 import webpackConfig from '../webpack.config';
-import { GRAPHQL_PORT } from '../../server/server';
+import { GRAPHQL_PORT, STATIC_PORT } from '../../config';
 
 
 function bundle() {
@@ -29,9 +29,9 @@ function bundle() {
         stats: webpackConfig.stats,
         historyApiFallback: true,
       });
-      server.listen(3000, 'localhost', function(err) {
+      server.listen(STATIC_PORT, 'localhost', function(err) {
         if (err) { console.log(err); }
-        console.log('Listening at localhost:3000');
+        console.log(`Listening at localhost:${STATIC_PORT}`);
       });
     } else {
       bundler.run(onComplete);

@@ -3,7 +3,8 @@ import jwt from 'jwt-simple';
 import {
   GraphQLString,
 } from 'graphql';
-import { createEndpoint } from './endpoints';
+import { JWT_SECRET } from '../../config';
+import { createEndpoint } from '../lib/endpoint';
 
 const NAME = 'User';
 
@@ -25,7 +26,8 @@ export const {
 
 export async function auth(/* name, password */) {
   const users = await userEndpoint.Model.limit(1).run();
-  return users ? users[0] : await userEndpoint.create({
+
+  return users.length ? users[0] : await userEndpoint.create({
     name: 'hello-world',
   });
 }
@@ -33,12 +35,13 @@ export async function auth(/* name, password */) {
 export function createToken(payload) {
   return jwt.encode({
     ...payload,
-  }, process.env.JWT_SECRET);
+  }, JWT_SECRET);
 }
 
 export const router = new Router();
 router.post('/auth', async (req, res) => {
   const { name, password } = req.body;
+
   const user = await auth(name, password);
   if (!user) {
     // TODO: Implement this part

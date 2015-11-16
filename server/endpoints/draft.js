@@ -9,11 +9,11 @@ import {
 import {
   resourceToEdge,
 } from '../lib/edge';
-import { createEndpoint } from './endpoints';
+import { createEndpoint } from '../lib/endpoint';
 import {
   revisionEndpoint,
   GraphQLType as revisionType,
-} from './revisionEndpoint';
+} from './revision';
 
 
 const NAME = 'Draft';

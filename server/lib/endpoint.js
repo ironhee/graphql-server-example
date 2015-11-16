@@ -15,10 +15,10 @@ import { r } from '../thinky';
 import {
   applyCursorsToEdgeOffsets,
   edgeOffsetsToReturn,
-} from '../lib/arrayConnection';
+} from './arrayConnection';
 import {
   resourceToEdge,
-} from '../lib/edge';
+} from './edge';
 
 
 const endpoints = {};

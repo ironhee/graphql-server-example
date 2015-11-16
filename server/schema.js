@@ -2,20 +2,20 @@ import {
   GraphQLObjectType,
   GraphQLSchema,
 } from 'graphql';
-import { nodeField } from './endpoints/endpoints';
+import { nodeField } from './lib/endpoint';
 import {
   GraphQLConnectionField as GraphQLDraftConnectionField,
   GraphQLReviseMutation as GraphQLDraftReviseMutation,
   GraphQLCreateMutation as GraphQLDraftCreateMutation,
   GraphQLUpdateMutation as GraphQLDraftUpdateMutation,
   GraphQLRemoveMutation as GraphQLDraftRemoveMutation,
-} from './endpoints/draftEndpoint';
+} from './endpoints/draft';
 import {
   GraphQLConnectionField as GraphQLRevisionConnectionField,
-} from './endpoints/revisionEndpoint';
+} from './endpoints/revision';
 import {
   GraphQLConnectionField as GraphQLUserConnectionField,
-} from './endpoints/userEndpoint';
+} from './endpoints/user';
 
 const GraphQLPool = new GraphQLObjectType({
   name: 'Pool',

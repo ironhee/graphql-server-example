@@ -1,7 +1,7 @@
 import {
   GraphQLString,
 } from 'graphql';
-import { createEndpoint } from './endpoints';
+import { createEndpoint } from '../lib/endpoint';
 
 const NAME = 'Revision';
 

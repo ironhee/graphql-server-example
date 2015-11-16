@@ -1,19 +1,19 @@
 import thinky, { type, r } from './thinky';
 
-const Draft = thinky.createModel('Draft', {
+export const Draft = thinky.createModel('Draft', {
   id: type.string().min(2),
   content: type.string(),
   createdAt: type.date().default(r.now()),
 });
 
-const Revision = thinky.createModel('Revision', {
+export const Revision = thinky.createModel('Revision', {
   id: type.string().min(2),
   draftId: type.string(),
   content: type.string(),
   createdAt: type.date().default(r.now()),
 });
 
-const User = thinky.createModel('User', {
+export const User = thinky.createModel('User', {
   id: type.string().min(2),
   name: type.string(),
   createdAt: type.date().default(r.now()),
