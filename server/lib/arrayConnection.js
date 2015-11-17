@@ -5,7 +5,7 @@ import { r } from '../thinky';
 
 const PREFIX = 'arrayconnection:';
 
-async function indexOfResource(query, resourceId) {
+export async function indexOfResource(query, resourceId) {
   return (
     await query.offsetsOf(r.row('id').eq(resourceId)).execute()
   )[0];
@@ -20,11 +20,15 @@ export function cursorToNodeId(cursor) {
 }
 
 export function resourceIdToCursor(resourceType, resourceId) {
-  return nodeIdToCursor(toGlobalId(resourceType, resourceId));
+  return nodeIdToCursor(
+    toGlobalId(resourceType, resourceId)
+  );
 }
 
 export function cursorToResourceId(cursor) {
-  const { id: resourceId } = fromGlobalId(cursorToNodeId(cursor));
+  const { id: resourceId } = fromGlobalId(
+    cursorToNodeId(cursor)
+  );
   return resourceId;
 }
 
@@ -32,46 +36,64 @@ export function cursorToResourceId(cursor) {
 export async function applyCursorsToEdgeOffsets(query, args) {
   const { after, before } = args;
 
-  let afterOffset = 0;
+  let afterOffset;
   if (after) {
     const resourceId = cursorToResourceId(after);
     afterOffset = await indexOfResource(query, resourceId);
     afterOffset = !_.isUndefined(afterOffset) ?
       afterOffset + 1 : 0;
+  } else {
+    afterOffset = 0;
   }
 
-  let beforeOffset = null;
+  let beforeOffset;
   if (before) {
     const resourceId = cursorToResourceId(before);
     beforeOffset = await indexOfResource(query, resourceId);
     beforeOffset = !_.isUndefined(beforeOffset) ?
-      Math.max(beforeOffset, afterOffset, 0) : null;
+      Math.max(beforeOffset, afterOffset, 0) - 1 : 0;
+  } else {
+    const beforeResource = await query.nth(-1).default(null).run();
+    beforeOffset = beforeResource ?
+      await indexOfResource(query, beforeResource.id) : 0;
   }
-
 
   return { afterOffset, beforeOffset };
 }
 
 // https://facebook.github.io/relay/graphql/connections.htm#EdgesToReturn()
-export async function edgeOffsetsToReturn(offsets, args) {
-  let { afterOffset, beforeOffset } = offsets;
+export function edgeOffsetsToReturn(offsets, args) {
+  let {
+    afterOffset: startOffset,
+    beforeOffset: endOffset,
+  } = offsets;
   const { first, last } = args;
 
   if (first) {
-    // TODO: compute Edge length explicity
-    if ((beforeOffset !== null && beforeOffset - afterOffset > first) ||
-        beforeOffset === null) {
-      beforeOffset = afterOffset + first;
+    if (endOffset - startOffset + 1 > first) {
+      endOffset = startOffset + first - 1;
     }
   }
 
   if (last) {
-    // TODO: last should be performed without afterOffset(before).
-    if (beforeOffset !== null && beforeOffset - afterOffset > last) {
-      // EndOffset >= StartOffset >= 0
-      afterOffset = Math.max(beforeOffset - last, afterOffset, 0);
+    if (endOffset - startOffset + 1 > last) {
+      startOffset = Math.max(endOffset - last + 1, startOffset, 0);
     }
   }
 
-  return { startOffset: afterOffset, endOffset: beforeOffset };
+  return { startOffset, endOffset };
+}
+
+export async function connectionArgsToOffsets(query, args) {
+  const { after, first, before, last } = args;
+
+  const { afterOffset, beforeOffset } = await applyCursorsToEdgeOffsets(
+    query, { after, before }
+  );
+  const { startOffset, endOffset } = edgeOffsetsToReturn(
+    { afterOffset, beforeOffset },
+    { first, last }
+  );
+
+  return { afterOffset, beforeOffset, startOffset, endOffset };
 }

@@ -13,8 +13,7 @@ import {
 import { getModel } from '../models';
 import { r } from '../thinky';
 import {
-  applyCursorsToEdgeOffsets,
-  edgeOffsetsToReturn,
+  connectionArgsToOffsets,
 } from './arrayConnection';
 import {
   resourceToEdge,
@@ -24,7 +23,8 @@ import {
 const endpoints = {};
 
 export function createEndpoint(name, ...args) {
-  const endpoint = new Endpoint(name, ...args);
+  const Model = getModel(name);
+  const endpoint = new Endpoint(Model, ...args);
   endpoints[name] = endpoint;
   return endpoint;
 }
@@ -51,14 +51,28 @@ export const {nodeInterface, nodeField} = nodeDefinitions(
 );
 
 export class Endpoint {
-  constructor(name, fields) {
+  constructor(Model, fields) {
+    this.Model = Model;
+    const name = Model.getTableName();
     this.name = name;
-    this.Model = getModel(this.name);
-    this.GraphQLType = createGraphQLType(name, fields);
-    const { GraphQLConnectionType, GraphQLEdgeType } = createConnectionDefinitions(name, this.GraphQLType);
-    this.GraphQLConnectionType = GraphQLConnectionType;
-    this.GraphQLEdgeType = GraphQLEdgeType;
-    this.GraphQLConnectionField = createConnectionField(this);
+    this.GraphQLType = new GraphQLObjectType({
+      name,
+      fields: {
+        id: globalIdField(name),
+        ...fields,
+      },
+      interfaces: [nodeInterface],
+    });
+    const { connectionType, edgeType } = connectionDefinitions({
+      name: name, nodeType: this.GraphQLType });
+    this.GraphQLConnectionType = connectionType;
+    this.GraphQLEdgeType = edgeType;
+    this.GraphQLConnectionField = {
+      type: this.GraphQLConnectionType,
+      args: connectionArgs,
+      resolve: async (root, { after, first, before, last }) =>
+        await this.getConnection({ after, first, before, last }),
+    };
   }
 
   toGlobalId(id) {
@@ -92,63 +106,28 @@ export class Endpoint {
 
     const query = this.Model.orderBy(r.desc('createdAt'));
 
-    const { afterOffset, beforeOffset } =
-      await applyCursorsToEdgeOffsets(query, { after, before });
-    const { startOffset, endOffset } =
-      await edgeOffsetsToReturn({ afterOffset, beforeOffset }, { first, last });
+    const { afterOffset, beforeOffset, startOffset, endOffset } =
+      await connectionArgsToOffsets(query, { after, before, first, last });
+    const edgesLength = beforeOffset - afterOffset + 1;
 
-    if (endOffset === null) { throw Error('using last without before is not supported yet.'); }
-
-    // endOffset + 1 is trick for check whether rows remain or not.
     const resources = await query.slice(startOffset, endOffset + 1).getJoin().run();
 
-    const edgesSize = endOffset - startOffset;
-    const edges = resources.slice(0, edgesSize).map((resource) =>
+    const edges = resources.map((resource) =>
       resourceToEdge(resource));
 
     const firstEdge = _.first(edges);
     const lastEdge = _.last(edges);
-    const lowerBound = after ? (afterOffset + 1) : 0;
-    const upperBound = before ? beforeOffset : startOffset + resources.length;
+
     return {
       edges,
       pageInfo: {
         startCursor: firstEdge ? firstEdge.cursor : null,
         endCursor: lastEdge ? lastEdge.cursor : null,
-        hasPreviousPage: last !== null ? startOffset > lowerBound : false,
-        hasNextPage: first !== null ? endOffset < upperBound : false,
+        hasPreviousPage: last !== undefined && startOffset > 0 ?
+          edgesLength > last : false,
+        hasNextPage: first !== undefined ?
+          edgesLength > first : false,
       },
     };
   }
-}
-
-function createGraphQLType(name, fields) {
-  return new GraphQLObjectType({
-    name,
-    fields: {
-      id: globalIdField(name),
-      ...fields,
-    },
-    interfaces: [nodeInterface],
-  });
-}
-
-function createConnectionDefinitions(name, GraphQLType) {
-  const {
-    connectionType: GraphQLConnectionType,
-    edgeType: GraphQLEdgeType,
-  } = connectionDefinitions({
-    name: name,
-    nodeType: GraphQLType,
-  });
-  return { GraphQLConnectionType, GraphQLEdgeType };
-}
-
-function createConnectionField(endpoint) {
-  return {
-    type: endpoint.GraphQLConnectionType,
-    args: connectionArgs,
-    resolve: async (root, { after, first, before, last }) =>
-      await endpoint.getConnection({ after, first, before, last }),
-  };
 }
