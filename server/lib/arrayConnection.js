@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { fromGlobalId, toGlobalId } from 'graphql-relay';
 import { base64, unbase64 } from './base64';
+import ExtendableError from './ExtendableError';
 import { r } from '../thinky';
 
 const PREFIX = 'arrayconnection:';
@@ -62,20 +63,22 @@ export async function applyCursorsToEdgeOffsets(query, args) {
 }
 
 // https://facebook.github.io/relay/graphql/connections.htm#EdgesToReturn()
-export function edgeOffsetsToReturn(offsets, args) {
-  let {
-    afterOffset: startOffset,
-    beforeOffset: endOffset,
-  } = offsets;
-  const { first, last } = args;
+export function edgeOffsetsToReturn({
+  afterOffset, beforeOffset,
+}, {
+  first, last,
+}) {
+  assertConnectionArgs({ first, last });
+  let startOffset = afterOffset;
+  let endOffset = beforeOffset;
 
-  if (first) {
+  if (_.isNumber(first)) {
     if (endOffset - startOffset + 1 > first) {
       endOffset = startOffset + first - 1;
     }
   }
 
-  if (last) {
+  if (_.isNumber(last)) {
     if (endOffset - startOffset + 1 > last) {
       startOffset = Math.max(endOffset - last + 1, startOffset, 0);
     }
@@ -84,8 +87,8 @@ export function edgeOffsetsToReturn(offsets, args) {
   return { startOffset, endOffset };
 }
 
-export async function connectionArgsToOffsets(query, args) {
-  const { after, first, before, last } = args;
+export async function connectionArgsToOffsets(query, { after, first, before, last }) {
+  assertConnectionArgs({ first, last });
 
   const { afterOffset, beforeOffset } = await applyCursorsToEdgeOffsets(
     query, { after, before }
@@ -96,4 +99,16 @@ export async function connectionArgsToOffsets(query, args) {
   );
 
   return { afterOffset, beforeOffset, startOffset, endOffset };
+}
+
+export function assertConnectionArgs({ first, last }) {
+  if (_.any([first, last], (amount) => _.isNumber(amount) && amount <= 0)) {
+    throw new InvalidConnectionArgsTypeError();
+  }
+}
+
+export class InvalidConnectionArgsTypeError extends ExtendableError {
+  constructor() {
+    super('first and last must more than 0');
+  }
 }

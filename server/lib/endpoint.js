@@ -14,6 +14,7 @@ import { getModel } from '../models';
 import { r } from '../thinky';
 import {
   connectionArgsToOffsets,
+  assertConnectionArgs,
 } from './arrayConnection';
 import {
   resourceToEdge,
@@ -70,8 +71,14 @@ export class Endpoint {
     this.GraphQLConnectionField = {
       type: this.GraphQLConnectionType,
       args: connectionArgs,
-      resolve: async (root, { after, first, before, last }) =>
-        await this.getConnection({ after, first, before, last }),
+      resolve: async (root, args) => {
+        const { after, before, last } = args;
+        let { first } = args;
+
+        if (_.all([first, last], _.isUndefined)) { first = 10; }
+
+        return await this.getConnection({ after, first, before, last });
+      },
     };
   }
 
@@ -99,11 +106,8 @@ export class Endpoint {
     await resource.purge();
   }
 
-  async getConnection(args) {
-    const { after, before, last } = args;
-    let { first } = args;
-    if (!first && !last) { first = 10; }
-
+  async getConnection({ after, first, before, last }) {
+    assertConnectionArgs({ first, last });
     const query = this.Model.orderBy(r.desc('createdAt'));
 
     const { afterOffset, beforeOffset, startOffset, endOffset } =

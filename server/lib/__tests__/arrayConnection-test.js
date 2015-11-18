@@ -109,7 +109,17 @@ test.serial('#applyCursorsToEdgeOffsets with both', async t => {
   t.end();
 });
 
-test('#edgeOffsetsToReturn with first', t => {
+test('#edgeOffsetsToReturn with first: 0', t => {
+  t.throws(() => edgeOffsetsToReturn({
+    afterOffset: 0,
+    beforeOffset: 19,
+  }, {
+    first: 0,
+  }), Error);
+  t.end();
+});
+
+test('#edgeOffsetsToReturn with first: half', t => {
   const { startOffset, endOffset } = edgeOffsetsToReturn({
     afterOffset: 0,
     beforeOffset: 19,
@@ -121,7 +131,17 @@ test('#edgeOffsetsToReturn with first', t => {
   t.end();
 });
 
-test('#edgeOffsetsToReturn with last', t => {
+test('#edgeOffsetsToReturn with last: 0', t => {
+  t.throws(() => edgeOffsetsToReturn({
+    afterOffset: 0,
+    beforeOffset: 10,
+  }, {
+    first: 0,
+  }), Error);
+  t.end();
+});
+
+test('#edgeOffsetsToReturn with last: falf', t => {
   const { startOffset, endOffset } = edgeOffsetsToReturn({
     afterOffset: 0,
     beforeOffset: 19,
@@ -143,5 +163,16 @@ test('#edgeOffsetsToReturn with both', t => {
   });
   t.is(startOffset, 1);
   t.is(endOffset, 8);
+  t.end();
+});
+
+test('#edgeOffsetsToReturn with both: 0', t => {
+  t.throws(() => edgeOffsetsToReturn({
+    afterOffset: 0,
+    beforeOffset: 10,
+  }, {
+    first: 0,
+    last: 0,
+  }), Error);
   t.end();
 });
