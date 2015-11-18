@@ -4,12 +4,10 @@ import {
 } from 'graphql';
 import { createEndpoint } from '../lib/endpoint';
 import { Draft } from '../models';
-import {
-  endpoint as revisionEndpoint,
-} from './revision';
+import revisionEndpoint from './revision';
 
 
-export const endpoint = createEndpoint(Draft, () => ({
+const endpoint = createEndpoint(Draft, () => ({
   content: {
     type: new GraphQLNonNull(GraphQLString),
   },
@@ -21,9 +19,4 @@ export const endpoint = createEndpoint(Draft, () => ({
   },
 }));
 
-export const {
-  GraphQLType,
-  GraphQLConnectionType,
-  GraphQLEdgeType,
-  GraphQLConnectionField,
-} = endpoint;
+export default endpoint;

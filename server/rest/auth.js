@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import jwt from 'jwt-simple';
 import { JWT_SECRET } from '../../config';
-import { endpoint } from '../endpoints/user';
+import endpoint from '../endpoints/user';
 
 
 export async function auth(/* name, password */) {

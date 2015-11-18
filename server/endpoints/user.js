@@ -5,7 +5,7 @@ import { createEndpoint } from '../lib/endpoint';
 import { User } from '../models';
 
 
-export const endpoint = createEndpoint(User, {
+const endpoint = createEndpoint(User, {
   name: {
     type: GraphQLString,
   },
@@ -14,9 +14,4 @@ export const endpoint = createEndpoint(User, {
   },
 });
 
-export const {
-  GraphQLType,
-  GraphQLConnectionType,
-  GraphQLEdgeType,
-  GraphQLConnectionField,
-} = endpoint;
+export default endpoint;

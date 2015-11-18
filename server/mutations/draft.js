@@ -9,14 +9,11 @@ import {
 import {
   resourceToEdge,
 } from '../lib/arrayConnection';
-import {
-  endpoint as draftEndpoint,
+import draftEndpoint, {
   GraphQLType as GraphQLDraft,
   GraphQLEdgeType as GraphQLDraftEdge,
 } from '../endpoints/draft';
-import {
-  endpoint as revisionEndpoint,
-} from '../endpoints/revision';
+import revisionEndpoint from '../endpoints/revision';
 
 
 export const GraphQLReviseMutation = mutationWithClientMutationId({
