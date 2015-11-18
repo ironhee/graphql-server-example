@@ -1,32 +1,38 @@
 import test from 'ava';
 import register from 'babel-core/register';
 register();
-import _ from 'lodash';
-import { promisify } from 'bluebird';
-import Joi from 'joi';
 import {
   graphql,
   GraphQLSchema,
   GraphQLObjectType,
 } from 'graphql';
+import _ from 'lodash';
+import { promisify } from 'bluebird';
+import Joi from 'joi';
 import {
-  Model,
-  GraphQLConnectionField,
-} from '../draft';
+  Endpoint,
+} from '../endpoint';
+import { createModel } from '../../models';
 import { r } from '../../thinky';
 
-
+const TABLE = 'endpointGraphQLTest';
+let Model;
+let endpoint;
+let Schema;
 const validate = promisify(Joi.validate);
-const Schema = new GraphQLSchema({
-  query: new GraphQLObjectType({
-    name: 'Query',
-    fields: {
-      drafts: GraphQLConnectionField,
-    },
-  }),
-});
 
 test.before(async t => {
+  Model = createModel(TABLE, {});
+  endpoint = new Endpoint(Model, {
+  });
+  Schema = new GraphQLSchema({
+    query: new GraphQLObjectType({
+      name: 'Query',
+      fields: {
+        models: endpoint.GraphQLConnectionField,
+      },
+    }),
+  });
   await Model.delete().run();
   t.end();
 });
@@ -37,11 +43,12 @@ test.beforeEach(async t => {
 });
 
 test.after(async t => {
+  r.tableDrop(TABLE);
   await r.getPool().drain();
   t.end();
 });
 
-test.serial(async t => {
+test.serial('Endpoint#GraphQLConnectionField with first & after', async t => {
   await Model.save([
     { content: 'foo' },
     { content: 'bar' },
@@ -50,7 +57,7 @@ test.serial(async t => {
   /* first request */
   const result1 = await graphql(Schema, `
     query {
-      drafts(first: 1) {
+      models(first: 1) {
         pageInfo {
           startCursor
           endCursor
@@ -67,7 +74,7 @@ test.serial(async t => {
   `);
 
   const schema1 = Joi.object().keys({
-    drafts: Joi.object().keys({
+    models: Joi.object().keys({
       pageInfo: Joi.object().keys({
         startCursor: Joi.string().required(),
         endCursor: Joi.string().required(),
@@ -87,10 +94,10 @@ test.serial(async t => {
   await validate(result1.data, schema1);
 
   /* second request */
-  const after = _.get(result1.data, 'drafts.pageInfo.endCursor');
+  const after = _.get(result1.data, 'models.pageInfo.endCursor');
   const result2 = await graphql(Schema, `
     query {
-      drafts(first: 1, after: "${after}") {
+      models(first: 1, after: "${after}") {
         pageInfo {
           startCursor
           endCursor
@@ -107,7 +114,7 @@ test.serial(async t => {
   `);
 
   const schema2 = Joi.object().keys({
-    drafts: Joi.object().keys({
+    models: Joi.object().keys({
       pageInfo: Joi.object().keys({
         startCursor: Joi.string().required(),
         endCursor: Joi.string().required(),
@@ -129,7 +136,7 @@ test.serial(async t => {
   t.end();
 });
 
-test.serial(async t => {
+test.serial('Endpoint#GraphQLConnectionField with last & before', async t => {
   await Model.save([
     { content: 'foo' },
     { content: 'bar' },
@@ -138,7 +145,7 @@ test.serial(async t => {
   /* first request */
   const result1 = await graphql(Schema, `
     query {
-      drafts(last: 1) {
+      models(last: 1) {
         pageInfo {
           startCursor
           endCursor
@@ -155,7 +162,7 @@ test.serial(async t => {
   `);
 
   const schema1 = Joi.object().keys({
-    drafts: Joi.object().keys({
+    models: Joi.object().keys({
       pageInfo: Joi.object().keys({
         startCursor: Joi.string().required(),
         endCursor: Joi.string().required(),
@@ -175,10 +182,10 @@ test.serial(async t => {
   await validate(result1.data, schema1);
 
   /* second request */
-  const before = _.get(result1.data, 'drafts.pageInfo.startCursor');
+  const before = _.get(result1.data, 'models.pageInfo.startCursor');
   const result2 = await graphql(Schema, `
     query {
-      drafts(last: 1, before: "${before}") {
+      models(last: 1, before: "${before}") {
         pageInfo {
           startCursor
           endCursor
@@ -195,7 +202,7 @@ test.serial(async t => {
   `);
 
   const schema2 = Joi.object().keys({
-    drafts: Joi.object().keys({
+    models: Joi.object().keys({
       pageInfo: Joi.object().keys({
         startCursor: Joi.string().required(),
         endCursor: Joi.string().required(),

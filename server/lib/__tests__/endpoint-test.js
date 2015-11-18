@@ -1,7 +1,6 @@
 import test from 'ava';
 import register from 'babel-core/register';
 register();
-import { GraphQLString } from 'graphql';
 import _ from 'lodash';
 import {
   Endpoint,
@@ -16,11 +15,7 @@ let endpoint;
 
 test.before(async t => {
   Model = createModel(TABLE, {});
-  endpoint = new Endpoint(Model, {
-    id: {
-      type: GraphQLString,
-    },
-  });
+  endpoint = new Endpoint(Model, {});
   await Model.delete().run();
   t.end();
 });
@@ -36,14 +31,54 @@ test.after(async t => {
   t.end();
 });
 
-test.serial('Endpoint#getConnection with first: 0', async t => {
+test('Endpoint#Model', async t => {
+  t.is(endpoint.Model, Model);
+  t.end();
+});
+
+test('Endpoint#name', async t => {
+  t.is(endpoint.name, TABLE);
+  t.end();
+});
+
+test.serial('Endpoint#toGlobalId & Endpoint#fromGlobalId', async t => {
+  const resource = await Model.save({});
+  const globalId = endpoint.toGlobalId(resource.id);
+  const resourceId = endpoint.fromGlobalId(globalId);
+  t.not(globalId, resourceId);
+  t.is(resource.id, resourceId);
+  t.end();
+});
+
+test.serial('Endpoint#create', async t => {
+  const resource = await endpoint.create({});
+  t.ok(resource.id);
+  t.end();
+});
+
+test.serial('Endpoint#get', async t => {
+  const resource = await Model.save({});
+  const fetchedResource = await endpoint.get(resource.id);
+  t.same(resource.id, fetchedResource.id);
+  t.end();
+});
+
+test.serial('Endpoint#remove', async t => {
+  const resource = await Model.save({});
+  await endpoint.remove(resource.id);
+  const resources = await Model.run();
+  t.is(resources.length, 0);
+  t.end();
+});
+
+test.serial('Endpoint#getConnection() with first: 0', async t => {
   t.throws(endpoint.getConnection({
     first: 0,
   }), InvalidConnectionArgsTypeError);
   t.end();
 });
 
-test.serial('Endpoint#getConnection with first: half', async t => {
+test.serial('Endpoint#getConnection() with first: half', async t => {
   await Model.save(_.times(20, () => ({})));
   const {
     pageInfo,
@@ -57,7 +92,7 @@ test.serial('Endpoint#getConnection with first: half', async t => {
   t.end();
 });
 
-test.serial('Endpoint#getConnection with first: full', async t => {
+test.serial('Endpoint#getConnection() with first: full', async t => {
   await Model.save(_.times(20, () => ({})));
   const {
     pageInfo,
@@ -71,7 +106,7 @@ test.serial('Endpoint#getConnection with first: full', async t => {
   t.end();
 });
 
-test.serial('Endpoint#getConnection with first: over', async t => {
+test.serial('Endpoint#getConnection() with first: over', async t => {
   await Model.save(_.times(20, () => ({})));
   const {
     pageInfo,
@@ -85,14 +120,14 @@ test.serial('Endpoint#getConnection with first: over', async t => {
   t.end();
 });
 
-test.serial('Endpoint#getConnection with last: 0', async t => {
+test.serial('Endpoint#getConnection() with last: 0', async t => {
   t.throws(endpoint.getConnection({
     last: 0,
   }), Error);
   t.end();
 });
 
-test.serial('Endpoint#getConnection with last: half', async t => {
+test.serial('Endpoint#getConnection() with last: half', async t => {
   await Model.save(_.times(20, () => ({})));
   const {
     pageInfo,
@@ -106,7 +141,7 @@ test.serial('Endpoint#getConnection with last: half', async t => {
   t.end();
 });
 
-test.serial('Endpoint#getConnection with last: full', async t => {
+test.serial('Endpoint#getConnection() with last: full', async t => {
   await Model.save(_.times(20, () => ({})));
   const {
     pageInfo,
@@ -120,7 +155,7 @@ test.serial('Endpoint#getConnection with last: full', async t => {
   t.end();
 });
 
-test.serial('Endpoint#getConnection with last: over', async t => {
+test.serial('Endpoint#getConnection() with last: over', async t => {
   await Model.save(_.times(20, () => ({})));
   const {
     pageInfo,
