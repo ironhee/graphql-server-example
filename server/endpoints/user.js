@@ -5,10 +5,10 @@ import {
 } from 'graphql';
 import { JWT_SECRET } from '../../config';
 import { createEndpoint } from '../lib/endpoint';
+import { User } from '../models';
 
-const NAME = 'User';
 
-export const userEndpoint = createEndpoint(NAME, {
+export const endpoint = createEndpoint(User, {
   name: {
     type: GraphQLString,
   },
@@ -22,12 +22,12 @@ export const {
   GraphQLConnectionType,
   GraphQLEdgeType,
   GraphQLConnectionField,
-} = userEndpoint;
+} = endpoint;
 
 export async function auth(/* name, password */) {
-  const users = await userEndpoint.Model.limit(1).run();
+  const users = await endpoint.Model.limit(1).run();
 
-  return users.length ? users[0] : await userEndpoint.create({
+  return users.length ? users[0] : await endpoint.create({
     name: 'hello-world',
   });
 }
@@ -48,7 +48,7 @@ router.post('/auth', async (req, res) => {
     throw new Error();
   }
   const token = createToken({
-    userId: userEndpoint.toGlobalId(user.id),
+    userId: endpoint.toGlobalId(user.id),
   });
   res.json({ token });
 });

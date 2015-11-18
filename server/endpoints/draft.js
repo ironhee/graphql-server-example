@@ -12,13 +12,13 @@ import {
 import { createEndpoint } from '../lib/endpoint';
 import {
   revisionEndpoint,
-  GraphQLType as revisionType,
+  GraphQLType as GraphQLRevision,
 } from './revision';
-
+import { Draft } from '../models';
 
 const NAME = 'Draft';
 
-export const draftEndpoint = createEndpoint(NAME, {
+export const endpoint = createEndpoint(Draft, {
   content: {
     type: new GraphQLNonNull(GraphQLString),
   },
@@ -26,7 +26,7 @@ export const draftEndpoint = createEndpoint(NAME, {
     type: new GraphQLNonNull(GraphQLString),
   },
   revision: {
-    type: revisionType,
+    type: GraphQLRevision,
   },
 });
 
@@ -35,7 +35,7 @@ export const {
   GraphQLConnectionType,
   GraphQLEdgeType,
   GraphQLConnectionField,
-} = draftEndpoint;
+} = endpoint;
 
 export const GraphQLReviseMutation = mutationWithClientMutationId({
   name: NAME + 'Revise',
@@ -54,7 +54,7 @@ export const GraphQLReviseMutation = mutationWithClientMutationId({
   },
   mutateAndGetPayload: async ({ id: draftGlobalId, content }) => {
     const { id: draftId } = fromGlobalId(draftGlobalId);
-    const draft = await draftEndpoint.get(draftId);
+    const draft = await endpoint.get(draftId);
 
     if (draft.revision) {
       const revision = draft.revision;
@@ -86,7 +86,7 @@ export const GraphQLCreateMutation = mutationWithClientMutationId({
     },
   },
   mutateAndGetPayload: async ({ content }) => {
-    const draft = await draftEndpoint.create({content});
+    const draft = await endpoint.create({content});
     return {
       resource: draft,
     };
@@ -108,7 +108,7 @@ export const GraphQLRemoveMutation = mutationWithClientMutationId({
   },
   mutateAndGetPayload: async ({ id: globalId }) => {
     const {id} = fromGlobalId(globalId);
-    await draftEndpoint.remove(id);
+    await endpoint.remove(id);
   },
 });
 
@@ -130,7 +130,7 @@ export const GraphQLUpdateMutation = mutationWithClientMutationId({
   },
   mutateAndGetPayload: async ({ id: globalId, content }) => {
     const {id} = fromGlobalId(globalId);
-    const resource = await draftEndpoint.get(id);
+    const resource = await endpoint.get(id);
     await resource.merge({ content }).save();
     return { resource };
   },

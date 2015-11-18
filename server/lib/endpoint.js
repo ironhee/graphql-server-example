@@ -10,7 +10,6 @@ import {
   fromGlobalId,
   toGlobalId,
 } from 'graphql-relay';
-import { getModel } from '../models';
 import { r } from '../thinky';
 import {
   connectionArgsToOffsets,
@@ -21,9 +20,9 @@ import {
 
 const endpoints = {};
 
-export function createEndpoint(name, ...args) {
-  const Model = getModel(name);
+export function createEndpoint(Model, ...args) {
   const endpoint = new Endpoint(Model, ...args);
+  const name = Model.getTableName();
   endpoints[name] = endpoint;
   return endpoint;
 }

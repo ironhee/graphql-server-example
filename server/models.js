@@ -7,34 +7,16 @@ export function getModel(name) {
   return models[name];
 }
 
-export function createModel(name, ...args) {
-  const model = thinky.createModel(name, ...args);
+export function createModel(name, fields, ...args) {
+  const model = thinky.createModel(name, {
+    createdAt: type.date().default(r.now()),
+    id: type.string().min(2),
+    ...fields,
+  }, ...args);
   models[name] = model;
   model.defineStatic('exist', exist);
   return model;
 }
-
-export const Draft = createModel('Draft', {
-  id: type.string().min(2),
-  content: type.string(),
-  createdAt: type.date().default(r.now()),
-});
-
-export const Revision = createModel('Revision', {
-  id: type.string().min(2),
-  draftId: type.string(),
-  content: type.string(),
-  createdAt: type.date().default(r.now()),
-});
-
-export const User = createModel('User', {
-  id: type.string().min(2),
-  name: type.string(),
-  createdAt: type.date().default(r.now()),
-});
-
-Draft.hasOne(Revision, 'revision', 'id', 'draftId');
-Revision.belongsTo(Draft, 'draft', 'draftId', 'id');
 
 async function exist(offset) {
   try {
@@ -43,3 +25,19 @@ async function exist(offset) {
     return false;
   }
 }
+
+export const Draft = createModel('Draft', {
+  content: type.string(),
+});
+
+export const Revision = createModel('Revision', {
+  draftId: type.string(),
+  content: type.string(),
+});
+
+export const User = createModel('User', {
+  name: type.string(),
+});
+
+Draft.hasOne(Revision, 'revision', 'id', 'draftId');
+Revision.belongsTo(Draft, 'draft', 'draftId', 'id');

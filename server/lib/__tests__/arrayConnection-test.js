@@ -72,9 +72,7 @@ test.serial('#resourceToEdge', async t => {
 
   const schema = Joi.object().keys({
     cursor: Joi.string().required(),
-    node: Joi.object().keys({
-      id: Joi.string().required(),
-    }).required(),
+    node: Joi.object().required(),
   });
   await validate(cursor, schema);
   t.end();

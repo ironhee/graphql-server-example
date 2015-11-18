@@ -4,10 +4,17 @@ register();
 import _ from 'lodash';
 import { promisify } from 'bluebird';
 import Joi from 'joi';
-import { graphql } from 'graphql';
-import Schema from '../schema';
-import { Draft } from '../models';
-import { r } from '../thinky';
+import { graphql, GraphQLSchema } from 'graphql';
+import Schema from '../../schema';
+import { Draft } from '../../models';
+import { r } from '../../thinky';
+
+const validate = promisify(Joi.validate);
+
+test.before(async t => {
+  await Draft.delete().run();
+  t.end();
+});
 
 test.beforeEach(async t => {
   await Draft.delete().run();
@@ -15,14 +22,19 @@ test.beforeEach(async t => {
 });
 
 test.after(async t => {
-  await Draft.delete().run();
+  r.tableDrop('Draft');
   await r.getPool().drain();
   t.end();
 });
 
-const validate = promisify(Joi.validate);
-
 test.serial(async t => {
+  // const Schema = new GraphQLSchema({
+  //   query: {
+  //     fields: {
+  //
+  //     }
+  //   }
+  // });
   await Draft.save([
     { content: 'foo' },
     { content: 'bar' },
