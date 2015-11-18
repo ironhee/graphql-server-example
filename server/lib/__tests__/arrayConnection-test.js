@@ -2,6 +2,8 @@ import test from 'ava';
 import register from 'babel-core/register';
 register();
 import _ from 'lodash';
+import Joi from 'joi';
+import { promisify } from 'bluebird';
 import {
   indexOfResource,
   nodeIdToCursor,
@@ -10,6 +12,7 @@ import {
   cursorToResourceId,
   applyCursorsToEdgeOffsets,
   edgeOffsetsToReturn,
+  resourceToEdge,
   // connectionArgsToOffsets,
 } from '../arrayConnection';
 import { createModel } from '../../models';
@@ -17,6 +20,7 @@ import { r } from '../../thinky';
 
 const TABLE = 'arrayConnectionTest';
 let Model;
+const validate = promisify(Joi.validate);
 
 test.before(async t => {
   Model = createModel(TABLE, {});
@@ -59,6 +63,20 @@ test('#resourceIdToCursor, #cursorToResourceId', t => {
   const resourceId = cursorToResourceId(cursor);
   t.not(cursor, 'example');
   t.is(resourceId, 'example');
+  t.end();
+});
+
+test.serial('#resourceToEdge', async t => {
+  const model = await Model.save({});
+  const cursor = resourceToEdge(model);
+
+  const schema = Joi.object().keys({
+    cursor: Joi.string().required(),
+    node: Joi.object().keys({
+      id: Joi.string().required(),
+    }).required(),
+  });
+  await validate(cursor, schema);
   t.end();
 });
 

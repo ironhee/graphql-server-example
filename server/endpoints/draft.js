@@ -8,7 +8,7 @@ import {
 } from 'graphql-relay';
 import {
   resourceToEdge,
-} from '../lib/edge';
+} from '../lib/arrayConnection';
 import { createEndpoint } from '../lib/endpoint';
 import {
   revisionEndpoint,

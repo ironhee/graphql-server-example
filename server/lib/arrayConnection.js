@@ -33,6 +33,15 @@ export function cursorToResourceId(cursor) {
   return resourceId;
 }
 
+export function resourceToEdge(resource) {
+  const resourceType = resource.getModel().getTableName();
+  const resourceId = resource.id;
+  return {
+    cursor: resourceIdToCursor(resourceType, resourceId),
+    node: resource,
+  };
+}
+
 // https://facebook.github.io/relay/graphql/connections.htm#ApplyCursorsToEdgeOffsets()
 export async function applyCursorsToEdgeOffsets(query, args) {
   const { after, before } = args;

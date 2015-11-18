@@ -15,10 +15,8 @@ import { r } from '../thinky';
 import {
   connectionArgsToOffsets,
   assertConnectionArgs,
-} from './arrayConnection';
-import {
   resourceToEdge,
-} from './edge';
+} from './arrayConnection';
 
 
 const endpoints = {};
