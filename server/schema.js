@@ -5,10 +5,6 @@ import {
 import { nodeField } from './lib/endpoint';
 import {
   GraphQLConnectionField as GraphQLDraftConnectionField,
-  GraphQLReviseMutation as GraphQLDraftReviseMutation,
-  GraphQLCreateMutation as GraphQLDraftCreateMutation,
-  GraphQLUpdateMutation as GraphQLDraftUpdateMutation,
-  GraphQLRemoveMutation as GraphQLDraftRemoveMutation,
 } from './endpoints/draft';
 import {
   GraphQLConnectionField as GraphQLRevisionConnectionField,
@@ -16,6 +12,12 @@ import {
 import {
   GraphQLConnectionField as GraphQLUserConnectionField,
 } from './endpoints/user';
+import {
+  GraphQLReviseMutation as GraphQLDraftReviseMutation,
+  GraphQLCreateMutation as GraphQLDraftCreateMutation,
+  GraphQLUpdateMutation as GraphQLDraftUpdateMutation,
+  GraphQLRemoveMutation as GraphQLDraftRemoveMutation,
+} from './mutations/draft';
 
 const GraphQLPool = new GraphQLObjectType({
   name: 'Pool',

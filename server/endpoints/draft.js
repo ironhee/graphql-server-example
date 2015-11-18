@@ -2,23 +2,14 @@ import {
   GraphQLString,
   GraphQLNonNull,
 } from 'graphql';
-import {
-  fromGlobalId,
-  mutationWithClientMutationId,
-} from 'graphql-relay';
-import {
-  resourceToEdge,
-} from '../lib/arrayConnection';
 import { createEndpoint } from '../lib/endpoint';
-import {
-  revisionEndpoint,
-  GraphQLType as GraphQLRevision,
-} from './revision';
 import { Draft } from '../models';
+import {
+  endpoint as revisionEndpoint,
+} from './revision';
 
-const NAME = 'Draft';
 
-export const endpoint = createEndpoint(Draft, {
+export const endpoint = createEndpoint(Draft, () => ({
   content: {
     type: new GraphQLNonNull(GraphQLString),
   },
@@ -26,9 +17,9 @@ export const endpoint = createEndpoint(Draft, {
     type: new GraphQLNonNull(GraphQLString),
   },
   revision: {
-    type: GraphQLRevision,
+    type: revisionEndpoint.GraphQLType,
   },
-});
+}));
 
 export const {
   GraphQLType,
@@ -36,102 +27,3 @@ export const {
   GraphQLEdgeType,
   GraphQLConnectionField,
 } = endpoint;
-
-export const GraphQLReviseMutation = mutationWithClientMutationId({
-  name: NAME + 'Revise',
-  inputFields: {
-    id: {
-      type: new GraphQLNonNull(GraphQLString),
-    },
-    content: {
-      type: new GraphQLNonNull(GraphQLString),
-    },
-  },
-  outputFields: {
-    draft: {
-      type: GraphQLType,
-    },
-  },
-  mutateAndGetPayload: async ({ id: draftGlobalId, content }) => {
-    const { id: draftId } = fromGlobalId(draftGlobalId);
-    const draft = await endpoint.get(draftId);
-
-    if (draft.revision) {
-      const revision = draft.revision;
-      revision.merge({ content });
-      await revision.save();
-    } else {
-      const revision = await revisionEndpoint.create({ content });
-      draft.revision = revision;
-      await draft.saveAll({ revision: true });
-    }
-
-    return {
-      draft,
-    };
-  },
-});
-
-export const GraphQLCreateMutation = mutationWithClientMutationId({
-  name: NAME + 'Create',
-  inputFields: {
-    content: {
-      type: new GraphQLNonNull(GraphQLString),
-    },
-  },
-  outputFields: {
-    draftEdge: {
-      type: GraphQLEdgeType,
-      resolve: ({ resource }) => resourceToEdge(resource),
-    },
-  },
-  mutateAndGetPayload: async ({ content }) => {
-    const draft = await endpoint.create({content});
-    return {
-      resource: draft,
-    };
-  },
-});
-
-export const GraphQLRemoveMutation = mutationWithClientMutationId({
-  name: NAME + 'Remove',
-  inputFields: {
-    id: {
-      type: new GraphQLNonNull(GraphQLString),
-    },
-  },
-  outputFields: {
-    draftEdge: {
-      type: GraphQLEdgeType,
-      resolve: () => null,
-    },
-  },
-  mutateAndGetPayload: async ({ id: globalId }) => {
-    const {id} = fromGlobalId(globalId);
-    await endpoint.remove(id);
-  },
-});
-
-export const GraphQLUpdateMutation = mutationWithClientMutationId({
-  name: NAME + 'Update',
-  inputFields: {
-    id: {
-      type: new GraphQLNonNull(GraphQLString),
-    },
-    content: {
-      type: GraphQLString,
-    },
-  },
-  outputFields: {
-    draftEdge: {
-      type: GraphQLEdgeType,
-      resolve: (resource) => resourceToEdge(resource),
-    },
-  },
-  mutateAndGetPayload: async ({ id: globalId, content }) => {
-    const {id} = fromGlobalId(globalId);
-    const resource = await endpoint.get(id);
-    await resource.merge({ content }).save();
-    return { resource };
-  },
-});

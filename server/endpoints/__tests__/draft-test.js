@@ -4,7 +4,7 @@ register();
 import _ from 'lodash';
 import { promisify } from 'bluebird';
 import Joi from 'joi';
-import { graphql, GraphQLSchema } from 'graphql';
+import { graphql } from 'graphql';
 import Schema from '../../schema';
 import { Draft } from '../../models';
 import { r } from '../../thinky';
@@ -28,13 +28,6 @@ test.after(async t => {
 });
 
 test.serial(async t => {
-  // const Schema = new GraphQLSchema({
-  //   query: {
-  //     fields: {
-  //
-  //     }
-  //   }
-  // });
   await Draft.save([
     { content: 'foo' },
     { content: 'bar' },

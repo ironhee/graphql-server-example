@@ -55,10 +55,10 @@ export class Endpoint {
     this.name = name;
     this.GraphQLType = new GraphQLObjectType({
       name,
-      fields: {
+      fields: () => ({
         id: globalIdField(name),
-        ...fields,
-      },
+        ..._.result(fields),
+      }),
       interfaces: [nodeInterface],
     });
     const { connectionType, edgeType } = connectionDefinitions({
