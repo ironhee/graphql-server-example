@@ -59,10 +59,12 @@ Tasks
 
 ## TODO
 
+- [ ] Error handling
 - [ ] Babel > 6.x
 - [ ] Find client-side alternative library
 - [ ] Implement server-side auth
-- [ ] Server optimization
+- [ ] Optimize Connection Implementation
+- [ ] Implement ACL
 - [ ] AWS Deploy
 
 ## Related Links
