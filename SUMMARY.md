@@ -3,6 +3,6 @@
 * [Introdution](docs/introdution.md)
    * What is it
    * Stack
-* [Todo](docs/todo.md)
 * How to
+* [Todo](docs/todo.md)
 
