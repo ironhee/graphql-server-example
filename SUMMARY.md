@@ -1,10 +1,6 @@
 # Summary
 
-* [Introduction](README.md)
-* [Introdution](docs/introdution.md)
-   * What is it
-   * Stack
-* [Todo](docs/todo.md)
-* [Development](docs/development.md)
-   * Tasks
-
+* [Introduction](docs/Introduction.md)
+* [Development](docs/Development.md)
+* [Todo](docs/Todo.md)
+* [Related Links](docs/RelatedLinks.md)
