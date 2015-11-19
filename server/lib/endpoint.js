@@ -56,8 +56,8 @@ export class Endpoint {
     this.GraphQLType = new GraphQLObjectType({
       name,
       fields: () => ({
+        ..._.isFunction(fields) ? fields() : fields,
         id: globalIdField(name),
-        ..._.result(fields),
       }),
       interfaces: [nodeInterface],
     });
