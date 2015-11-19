@@ -5,6 +5,7 @@ import {
   graphql,
   GraphQLSchema,
   GraphQLObjectType,
+  GraphQLString,
 } from 'graphql';
 import _ from 'lodash';
 import { promisify } from 'bluebird';
@@ -13,7 +14,7 @@ import {
   Endpoint,
 } from '../endpoint';
 import { createModel } from '../../models';
-import { r } from '../../thinky';
+import { r, type } from '../../thinky';
 
 const TABLE = 'endpointGraphQLTest';
 let Model;
@@ -22,8 +23,13 @@ let Schema;
 const validate = promisify(Joi.validate);
 
 test.before(async t => {
-  Model = createModel(TABLE, {});
+  Model = createModel(TABLE, {
+    content: type.string(),
+  });
   endpoint = new Endpoint(Model, {
+    content: {
+      type: GraphQLString,
+    },
   });
   Schema = new GraphQLSchema({
     query: new GraphQLObjectType({
@@ -67,6 +73,9 @@ test.serial('Endpoint#GraphQLConnectionField with first & after', async t => {
         edges {
           node {
             id
+            ...on ${TABLE} {
+              content
+            }
           }
         }
       }
@@ -85,6 +94,7 @@ test.serial('Endpoint#GraphQLConnectionField with first & after', async t => {
         Joi.object().keys({
           node: Joi.object().keys({
             id: Joi.string().required(),
+            content: Joi.string().required(),
           }).required(),
         }).required(),
       ).required(),
@@ -107,6 +117,9 @@ test.serial('Endpoint#GraphQLConnectionField with first & after', async t => {
         edges {
           node {
             id
+            ...on ${TABLE} {
+              content
+            }
           }
         }
       }
@@ -125,6 +138,7 @@ test.serial('Endpoint#GraphQLConnectionField with first & after', async t => {
         Joi.object().keys({
           node: Joi.object().keys({
             id: Joi.string().required(),
+            content: Joi.string().required(),
           }).required(),
         }).required(),
       ).required(),
@@ -155,6 +169,9 @@ test.serial('Endpoint#GraphQLConnectionField with last & before', async t => {
         edges {
           node {
             id
+            ...on ${TABLE} {
+              content
+            }
           }
         }
       }
@@ -173,6 +190,7 @@ test.serial('Endpoint#GraphQLConnectionField with last & before', async t => {
         Joi.object().keys({
           node: Joi.object().keys({
             id: Joi.string().required(),
+            content: Joi.string().required(),
           }).required(),
         }).required(),
       ).required(),
@@ -195,6 +213,9 @@ test.serial('Endpoint#GraphQLConnectionField with last & before', async t => {
         edges {
           node {
             id
+            ...on ${TABLE} {
+              content
+            }
           }
         }
       }
@@ -213,6 +234,7 @@ test.serial('Endpoint#GraphQLConnectionField with last & before', async t => {
         Joi.object().keys({
           node: Joi.object().keys({
             id: Joi.string().required(),
+            content: Joi.string().required(),
           }).required(),
         }).required(),
       ).required(),
