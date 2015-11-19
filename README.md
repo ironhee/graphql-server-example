@@ -14,17 +14,22 @@ npm install
 brew install rethinkdb  # or another package manager
 ```
 
-2. Run GraphQL server
+2. Run RethinkDB
+```bash
+rethinkdb
+```
+
+3. Run GraphQL server
 ```bash
 npm run server
 ```
 
-3. Show in browser
+4. Show in browser
 ```bash
 open http://localhost:5000/graphql
 ```
 
-4. If you need more information, See [Development](https://ironhee.gitbooks.io/graphql-server-example/content/docs/Development.html)
+5. If you need more information, See [Development](https://ironhee.gitbooks.io/graphql-server-example/content/docs/Development.html)
 
 Stack
 ---------------------------------------------------------
