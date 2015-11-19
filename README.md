@@ -29,15 +29,6 @@ Tasks
   - Add Route (client/app.js)
   - Debug with relay client [http://localhost:3000/](http://localhost:3000/)
 
-## TODO
-
-- [ ] Error handling
-- [ ] Babel > 6.x
-- [ ] Find client-side alternative library
-- [ ] Implement server-side auth
-- [ ] Optimize Connection Implementation
-- [ ] Implement ACL
-- [ ] AWS Deploy
 
 ## Related Links
 
