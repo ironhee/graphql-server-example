@@ -23,7 +23,6 @@ Development
   - Add to schema (server/schema.js)
   - Update GraphQL Schema
   - Debug with graphiql [http://localhost:5000/graphql](http://localhost:5000/graphql)
-
 + Client
   - Watch client
   - Create component (client/components/Example.js)
