@@ -49,10 +49,12 @@ export const {nodeInterface, nodeField} = nodeDefinitions(
 );
 
 export class Endpoint {
-  constructor(Model, fields) {
+  constructor(Model, { fields }, connectionConfig) {
     this.Model = Model;
     const name = Model.getTableName();
     this.name = name;
+
+    /* GraphQLObject */
     this.GraphQLType = new GraphQLObjectType({
       name,
       fields: () => ({
@@ -61,8 +63,13 @@ export class Endpoint {
       }),
       interfaces: [nodeInterface],
     });
+
+    /* GraphQLConnection */
     const { connectionType, edgeType } = connectionDefinitions({
-      name: name, nodeType: this.GraphQLType });
+      name,
+      nodeType: this.GraphQLType,
+      ...connectionConfig,
+    });
     this.GraphQLConnectionType = connectionType;
     this.GraphQLEdgeType = edgeType;
     this.GraphQLConnectionField = {

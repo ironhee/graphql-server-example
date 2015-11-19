@@ -1,7 +1,9 @@
 import express from 'express';
 import graphqlHTTP from 'express-graphql';
+import _ from 'lodash';
 import { GRAPHQL_PORT, JWT_SECRET } from '../config';
 import jwt from './middlewares/jwt';
+import currentUser from './middlewares/currentUser';
 import bodyParser from 'body-parser';
 import Schema from './schema';
 import { router as authRouter } from './rest/auth';
@@ -12,9 +14,11 @@ export function run() {
 
   // Middlewares
   server.use([
-    jwt(JWT_SECRET),
     bodyParser.urlencoded({ extended: false }),
     bodyParser.json(),
+    // bussiness logic
+    jwt(JWT_SECRET),
+    currentUser,
   ]);
 
   // REST Routers
@@ -24,12 +28,10 @@ export function run() {
 
   // GraphQL
   server.use('/', graphqlHTTP(
-    request => ({
+    req => ({
       schema: Schema,
       pretty: true,
-      rootValue: {
-        uid: request.token ? request.token.userid : null,
-      },
+      rootValue: _.pick(req, 'token', 'currentUser'),
       graphiql: true,
     })
   ));

@@ -6,16 +6,18 @@ import { Revision } from '../models';
 import draftEndpoint from './draft';
 
 
-const endpoint = createEndpoint(Revision, () => ({
-  content: {
-    type: GraphQLString,
-  },
-  createdAt: {
-    type: GraphQLString,
-  },
-  draft: {
-    type: draftEndpoint.GraphQLType,
-  },
-}));
+const endpoint = createEndpoint(Revision, {
+  fields: () => ({
+    content: {
+      type: GraphQLString,
+    },
+    createdAt: {
+      type: GraphQLString,
+    },
+    draft: {
+      type: draftEndpoint.GraphQLType,
+    },
+  }),
+});
 
 export default endpoint;

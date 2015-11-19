@@ -6,11 +6,13 @@ import { User } from '../models';
 
 
 const endpoint = createEndpoint(User, {
-  name: {
-    type: GraphQLString,
-  },
-  createdAt: {
-    type: GraphQLString,
+  fields: {
+    name: {
+      type: GraphQLString,
+    },
+    createdAt: {
+      type: GraphQLString,
+    },
   },
 });
 

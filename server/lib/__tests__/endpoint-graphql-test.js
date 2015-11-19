@@ -27,8 +27,10 @@ test.before(async t => {
     content: type.string(),
   });
   endpoint = new Endpoint(Model, {
-    content: {
-      type: GraphQLString,
+    fields: {
+      content: {
+        type: GraphQLString,
+      },
     },
   });
   Schema = new GraphQLSchema({
