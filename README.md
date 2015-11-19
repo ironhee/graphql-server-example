@@ -54,6 +54,14 @@ npm run test  # test once
 npm run test-watch  # watch test
 ```
 
+## TODO
+
+- [ ] Babel > 6.x
+- [ ] Find client-side alternative library
+- [ ] Implement server-side auth
+- [ ] Server optimization
+- [ ] AWS Deploy
+
 ## Related Links
 
 - [awesome-graphql](https://github.com/chentsulin/awesome-graphql)
