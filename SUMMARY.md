@@ -4,6 +4,6 @@
 * [Introdution](docs/introdution.md)
    * What is it
    * Stack
-* Development
+* [Development](docs/development.md)
 * [Todo](docs/todo.md)
 
