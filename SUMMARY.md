@@ -1,4 +1,4 @@
 # Summary
 
-* [Introduce](docs/INTRODUCE.md/intruduce)
+* [Introduce](docs/introduce)
 
