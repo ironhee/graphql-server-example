@@ -1,8 +1,6 @@
 # Introdution
 
-What is it?
----------------------------------------------------------
-Example Implementation of [GraphQL](https://facebook.github.io/graphql/) + [Relay](https://facebook.github.io/relay/) Server and Client.
+
 
 Stack
 ---------------------------------------------------------
