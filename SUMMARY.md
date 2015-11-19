@@ -4,4 +4,5 @@
    * What is it
    * Stack
 * [Todo](docs/todo.md)
+* How to
 
