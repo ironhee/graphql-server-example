@@ -7,27 +7,31 @@ Example Implementation of [GraphQL](https://facebook.github.io/graphql/) + [Rela
 Using
 ---------------------------------------------------------
 1. Setup
-```bash
-git clone git@github.com:ironhee/graphql-server-example.git
-cd graphql-server-example
-npm install
-brew install rethinkdb  # or another package manager
-```
+
+  ```bash
+  git clone git@github.com:ironhee/graphql-server-example.git
+  cd graphql-server-example
+  npm install
+  brew install rethinkdb  # or another package manager
+  ```
 
 2. Run RethinkDB
-```bash
-rethinkdb
-```
+
+  ```bash
+  rethinkdb
+  ```
 
 3. Run GraphQL server
-```bash
-npm run server
-```
+
+  ```bash
+  npm run server
+  ```
 
 4. Show in browser
-```bash
-open http://localhost:5000/graphql
-```
+
+  ```bash
+  open http://localhost:5000/graphql
+  ```
 
 5. If you need more information, See [Development](https://ironhee.gitbooks.io/graphql-server-example/content/docs/Development.html)
 
