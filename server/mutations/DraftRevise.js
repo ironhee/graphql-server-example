@@ -12,7 +12,7 @@ import draftEndpoint, {
 import revisionEndpoint from '../endpoints/revision';
 
 
-export const DraftReviseMutation = mutationWithClientMutationId({
+const DraftReviseMutation = mutationWithClientMutationId({
   name: 'DraftRevise',
   inputFields: {
     id: {
@@ -46,3 +46,5 @@ export const DraftReviseMutation = mutationWithClientMutationId({
     };
   },
 });
+
+export default DraftReviseMutation;

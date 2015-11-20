@@ -12,7 +12,8 @@ import draftEndpoint, {
   GraphQLEdgeType as GraphQLDraftEdge,
 } from '../endpoints/draft';
 
-export const DraftCreateMutation = mutationWithClientMutationId({
+
+const DraftCreateMutation = mutationWithClientMutationId({
   name: 'DraftCreate',
   inputFields: {
     content: {
@@ -32,3 +33,5 @@ export const DraftCreateMutation = mutationWithClientMutationId({
     };
   },
 });
+
+export default DraftCreateMutation;

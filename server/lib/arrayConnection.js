@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { fromGlobalId, toGlobalId } from 'graphql-relay';
 import { base64, unbase64 } from './base64';
-import ExtendableError from './ExtendableError';
+import { InvalidArgumentsError } from './errors';
 import { r } from '../thinky';
 
 const PREFIX = 'arrayconnection:';
@@ -112,12 +112,6 @@ export async function connectionArgsToOffsets(query, { after, first, before, las
 
 export function assertConnectionArgs({ first, last }) {
   if (_.any([first, last], (amount) => _.isNumber(amount) && amount <= 0)) {
-    throw new InvalidConnectionArgsTypeError();
-  }
-}
-
-export class InvalidConnectionArgsTypeError extends ExtendableError {
-  constructor() {
-    super('first and last must more than 0');
+    throw new InvalidArgumentsError('first and last must more than 0');
   }
 }

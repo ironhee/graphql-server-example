@@ -11,7 +11,7 @@ import draftEndpoint, {
 } from '../endpoints/draft';
 
 
-export const DraftRemoveMutation = mutationWithClientMutationId({
+const DraftRemoveMutation = mutationWithClientMutationId({
   name: 'DraftRemove',
   inputFields: {
     id: {
@@ -29,3 +29,5 @@ export const DraftRemoveMutation = mutationWithClientMutationId({
     await draftEndpoint.remove(id);
   },
 });
+
+export default DraftRemoveMutation;

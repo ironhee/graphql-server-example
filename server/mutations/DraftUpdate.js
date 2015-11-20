@@ -14,7 +14,7 @@ import draftEndpoint, {
 } from '../endpoints/draft';
 
 
-export const DraftUpdateMutation = mutationWithClientMutationId({
+const DraftUpdateMutation = mutationWithClientMutationId({
   name: 'DraftUpdate',
   inputFields: {
     id: {
@@ -37,3 +37,5 @@ export const DraftUpdateMutation = mutationWithClientMutationId({
     return { resource };
   },
 });
+
+export default DraftUpdateMutation;
