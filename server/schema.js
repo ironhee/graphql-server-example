@@ -12,12 +12,11 @@ import {
 import {
   GraphQLConnectionField as GraphQLUserConnectionField,
 } from './endpoints/user';
-import {
-  GraphQLReviseMutation as GraphQLDraftReviseMutation,
-  GraphQLCreateMutation as GraphQLDraftCreateMutation,
-  GraphQLUpdateMutation as GraphQLDraftUpdateMutation,
-  GraphQLRemoveMutation as GraphQLDraftRemoveMutation,
-} from './mutations/draft';
+import DraftReviseMutation from './mutations/DraftRevise';
+import DraftCreateMutation from './mutations/DraftCreate';
+import DraftUpdateMutation from './mutations/DraftUpdate';
+import DraftRemoveMutation from './mutations/DraftRemove';
+
 
 const GraphQLPool = new GraphQLObjectType({
   name: 'Pool',
@@ -42,14 +41,17 @@ const Query = new GraphQLObjectType({
 const Mutation = new GraphQLObjectType({
   name: 'Mutation',
   fields: () => ({
-    reviseDraft: GraphQLDraftReviseMutation,
-    createDraft: GraphQLDraftCreateMutation,
-    updateDraft: GraphQLDraftUpdateMutation,
-    removeDraft: GraphQLDraftRemoveMutation,
+    reviseDraft: DraftReviseMutation,
+    createDraft: DraftCreateMutation,
+    updateDraft: DraftUpdateMutation,
+    removeDraft: DraftRemoveMutation,
   }),
 });
 
-export default new GraphQLSchema({
+const Schema = new GraphQLSchema({
   query: Query,
   mutation: Mutation,
 });
+
+
+export default Schema;
