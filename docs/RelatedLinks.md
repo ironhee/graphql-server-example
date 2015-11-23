@@ -2,6 +2,7 @@
 
 - [awesome-graphql](https://github.com/chentsulin/awesome-graphql)
 - [Overview of GraphQL](https://github.com/facebook/graphql)
+- [Learn GraphQL](https://learngraphql.com/)
 - [Specification for GraphQL](https://facebook.github.io/graphql/)
 - [Your First GraphQL Server](https://medium.com/@clayallsopp/your-first-graphql-server-3c766ab4f0a2#.r2j8gkb22)
 - GraphQL Relay Specification
