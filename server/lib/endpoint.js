@@ -35,7 +35,7 @@ export const {nodeInterface, nodeField} = nodeDefinitions(
   async (globalId) => {
     const { type: name, id } = fromGlobalId(globalId);
     const endpoint = getEndpoint(name);
-    const resource = await endpoint.get(id).getJoin().run();
+    const resource = await endpoint.get(id);
     return resource || null;
   },
   (obj) => {
